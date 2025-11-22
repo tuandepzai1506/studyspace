@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.studyspace">
 
+    <!-- Sửa lỗi 1 & 2: Thêm các thuộc tính chuẩn và đóng thẻ application đúng cách -->
     <application
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.StudySpace" >
-        <activity android:label="Study Space" android:name=".MainActivity"
+        android:theme="@style/Theme.StudySpace">
+
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateQuizActivity" />
-        <activity android:name=".AssignHomeworkActivity" />
-        <activity android:name=".CalendarActivity" />
-    </application>
 
-</manifest>
+        <!-- Khai báo các Activity khác là hoàn toàn chính xác -->
+        <activity android:name=".AddQuestionActivity" />
+        <activity android:name=".BankActivity" />
+
+    </application> <!-- Sửa lỗi 3: Đặt thẻ đóng application vào đúng vị trí -->
+
+</manifest> <!-- Sửa lỗi 4: Đảm bảo thẻ manifest đóng đúng và duy nhất ở cuối file -->
