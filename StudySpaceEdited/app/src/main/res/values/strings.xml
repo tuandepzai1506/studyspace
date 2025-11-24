@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">StudySpace</string>
+    <string name="content_description_fab_add">Tạo phòng Quizizz mới</string>
+</resources>
