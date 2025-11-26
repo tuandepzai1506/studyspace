@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">StudySpace</string>
     <string name="content_description_fab_add">Tạo phòng Quizizz mới</string>
+    <string name="title_activity_question_management">QuestionManagementActivity</string>
 </resources>

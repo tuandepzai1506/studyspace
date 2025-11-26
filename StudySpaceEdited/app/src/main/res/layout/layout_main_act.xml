@@ -79,7 +79,7 @@
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/editQuestion"
+                    android:id="@+id/button_question_bank"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
@@ -101,7 +101,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center"
-                            android:text="Tùy chỉnh\ncâu hỏi"
+                            android:text="Ngân hàng\ncâu hỏi"
                             android:textColor="#363636"
                             android:textSize="18sp"
                             android:textStyle="bold" />

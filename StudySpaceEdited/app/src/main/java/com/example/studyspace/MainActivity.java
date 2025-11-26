@@ -23,11 +23,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 public class MainActivity extends AppCompatActivity {
-
+    private Button buttonQuestionBank;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_act);
+        buttonQuestionBank = findViewById(R.id.button_question_bank);
+        if (buttonQuestionBank != null) {
+
+            buttonQuestionBank.setOnClickListener(v -> {
+
+                Intent intent = new Intent(MainActivity.this, QuestionManagementActivity.class);
+                startActivity(intent);
+            });
+        }
         ImageView add = (ImageView) findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
