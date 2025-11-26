@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TaoBoDe"
+    android:id="@+id/taoBoDe"
+    android:background="@drawable/eff_background">
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="114dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="44dp"
+        android:src="@drawable/logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo"
+        app:layout_constraintVertical_bias="0.0">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/CardViewScroll"
+            android:layout_width="341dp"
+            android:layout_height="500dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:fontFamily="@font/quicksand"
+                android:text="Danh sách bộ đề"
+                android:textColor="@color/black"
+                android:textFontWeight="1000">
+
+            </TextView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/Scroll"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:layout_marginTop="26dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text">
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/scrollVeiw"
+                    android:layout_width="match_parent"
+                    android:layout_height="500dp"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:fontFamily="@font/quicksand"
+                            android:gravity="center_vertical"
+                            android:text="Bộ 1"
+                            android:textColor="@color/black"
+                            android:textFontWeight="900">
+
+                        </TextView>
+
+                    </LinearLayout>
+                </androidx.core.widget.NestedScrollView>
+
+            </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <ImageView
+        android:id="@+id/add"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="30dp"
+        android:elevation="8dp"
+        android:src="@drawable/add_circle_40px"
+        app:layout_constraintBottom_toBottomOf="@+id/materialCardView"
+        app:layout_constraintEnd_toEndOf="@+id/materialCardView"
+        tools:ignore="MissingConstraints" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

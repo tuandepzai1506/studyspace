@@ -10,6 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.StudySpace">
+        <activity android:name=".TaoBoDe"
+            android:exported="false"/>
         <activity
             android:name=".createQuizizz"
             android:exported="false" />
@@ -23,9 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateQuizActivity" />
-        <activity android:name=".AssignHomeworkActivity" />
-        <activity android:name=".CalendarActivity" />
+
     </application>
 
 </manifest>

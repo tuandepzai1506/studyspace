@@ -53,7 +53,31 @@ public class MainActivity extends AppCompatActivity {
                     });
                 };
             });
-        };
-}
+        CardView makeTest = (CardView) findViewById(R.id.makeTest);
+        makeTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
+                v.startAnimation(flashAnim);
+
+                flashAnim.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {}
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        Intent intent = new Intent(MainActivity.this, TaoBoDe.class);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {}
+                });
+
+            }
+        });
+    }  // <-- Chỉ còn 1 dấu đóng onCreate
+}      // <-- đóng class
+
 
 
