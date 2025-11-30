@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "601674379338",
+    "project_id": "studyspace-a8d58",
+    "storage_bucket": "studyspace-a8d58.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:601674379338:android:48f957b978379267d976b3",
+        "android_client_info": {
+          "package_name": "com.example.studyspace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcSWbe4vYfJ-2HB825LHnovBBGMyQQ-K4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

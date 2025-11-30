@@ -5,22 +5,25 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.ArrayAdapter;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.studyspace.models.Question; // KIỂM TRA LẠI PACKAGE NÀY
-import com.example.studyspace.viewmodels.QuestionViewModel; // KIỂM TRA LẠI PACKAGE NÀY
+import com.example.studyspace.models.Question;
+import com.example.studyspace.viewmodels.QuestionViewModel;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 public class TaoBoDe extends AppCompatActivity {
@@ -30,172 +33,175 @@ public class TaoBoDe extends AppCompatActivity {
     // Khai báo các thành phần UI
     private Spinner spinnerTopic;
     private Spinner spinnerLevel;
-    private EditText editTextLimit; // Đổi lại thành EditText vì đây là nơi nhập số
+    private EditText editTextLimit;
     private Button buttonCreateQuiz;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tao_bo_de);
-
+        setContentView(R.layout.tao_bo_de); // Đảm bảo file layout đúng tên
 
         questionViewModel = new ViewModelProvider(this).get(QuestionViewModel.class);
-
+        ImageView add = findViewById(R.id.add);
+        if (add != null) {
+            add.setOnClickListener(v -> showAddPopup());
+        } else {
+            // Kiểm tra xem có tìm thấy nút không
+            Log.e("TaoBoDe", "Không tìm thấy nút Add!");
+        }
 
         try {
-
+            // Ánh xạ View
             spinnerTopic = findViewById(R.id.spinner_topic);
             spinnerLevel = findViewById(R.id.spinner_level);
-
             editTextLimit = findViewById(R.id.edittext_limit);
-            buttonCreateQuiz = findViewById(R.id.button_create_quiz);
+            buttonCreateQuiz = findViewById(R.id.button_create_file);
 
-            setupSpinners();
 
+
+
+            // Sự kiện nút Tạo Đề
             if (buttonCreateQuiz != null) {
                 buttonCreateQuiz.setOnClickListener(v -> taoBoDe());
-            } else {
-                Toast.makeText(this, "Lỗi UI: Nút Tạo Đề bị thiếu.", Toast.LENGTH_LONG).show();
             }
-
         } catch (Exception e) {
-            Log.e("TaoBoDe", "Lỗi tìm kiếm View ID. Hãy kiểm tra tao_bo_de.xml", e);
-            Toast.makeText(this, "Lỗi UI: Thiếu hoặc sai ID trong layout.", Toast.LENGTH_LONG).show();
+            Log.e("TaoBoDe", "Lỗi khởi tạo UI", e);
+            Toast.makeText(this, "Lỗi UI: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
-    private void setupSpinners() {
-        // 1. Adapter cho Chủ đề (spinnerTopic)
-        String[] topics = new String[]{"Toán", "Vật Lý", "Hóa Học", "Sinh Học", "Lịch Sử"};
-        ArrayAdapter<String> topicAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                topics
-        );
-        topicAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTopic.setAdapter(topicAdapter);
+    // --- KẾT THÚC ONCREATE TẠI ĐÂY ---
 
-        // 2. Adapter cho Độ khó (spinnerLevel)
-        String[] levels = new String[]{"1", "2", "3", "4", "5"};
-        ArrayAdapter<String> levelAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                levels
-        );
-        levelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerLevel.setAdapter(levelAdapter);
-    }
     /**
-     * Logic lấy dữ liệu từ ViewModel và Xuất file CSV
+     * Hàm cấu hình dữ liệu cho Spinner (Phải viết ngoài onCreate)
+     */
+
+
+    /**
+     * Hàm hiển thị Popup khi bấm nút Add
+     */
+    private void showAddPopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TaoBoDe.this); // Sửa context thành TaoBoDe.this
+
+        // Nạp giao diện popup
+        View popupView = LayoutInflater.from(this).inflate(R.layout.popup_makefile, null);
+        builder.setView(popupView);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Ánh xạ View trong Popup
+        Spinner spnSource = popupView.findViewById(R.id.spinner_topic);
+        Spinner spnLevel = popupView.findViewById(R.id.spinner_level);
+        Button btnConfirm = popupView.findViewById(R.id.button_create_file);
+
+        // Đổ dữ liệu vào Spinner trong Popup
+        String[] sources = {"Lấy ngẫu nhiên", "Lấy chỉ định"};
+        ArrayAdapter<String> sourceAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, sources);
+        sourceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnSource.setAdapter(sourceAdapter);
+
+        String[] levels = {"Dễ", "Trung Bình", "Khó"};
+        ArrayAdapter<String> levelAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, levels);
+        levelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spnLevel.setAdapter(levelAdapter);
+
+        // Xử lý nút Xác nhận trong Popup
+        btnConfirm.setOnClickListener(view -> {
+            String selectedSource = spnSource.getSelectedItem().toString();
+            dialog.dismiss();
+
+            Toast.makeText(TaoBoDe.this, "Bạn chọn: " + selectedSource, Toast.LENGTH_SHORT).show();
+
+            // Logic chuyển trang (Nếu cần)
+            if (selectedSource.equals("Lấy theo chủ đề")) {
+                // Ví dụ: Reset lại màn hình hiện tại hoặc làm gì đó
+                // Code cũ của bạn intent gọi chính nó là không cần thiết lắm
+            }
+        });
+    }
+
+    /**
+     * Logic tạo bộ đề và xuất file
      */
     private void taoBoDe() {
         String selectedTopic;
-        int selectedLevel;
+        int selectedLevel = 1;
         int questionLimit;
 
         try {
-            // Lấy giá trị đầu vào an toàn
             selectedTopic = spinnerTopic.getSelectedItem().toString();
-            selectedLevel = Integer.parseInt(spinnerLevel.getSelectedItem().toString());
-            questionLimit = Integer.parseInt(editTextLimit.getText().toString());
 
-            if (questionLimit <= 0) throw new NumberFormatException("Limit must be positive.");
+            // SỬA LỖI LOGIC: Chuyển chữ "DỄ/KHÓ" thành số 1/2/3
+            String levelStr = spinnerLevel.getSelectedItem().toString();
+            if (levelStr.equals("TRUNG BÌNH")) selectedLevel = 2;
+            if (levelStr.equals("KHÓ")) selectedLevel = 3;
+
+            String limitStr = editTextLimit.getText().toString();
+            if (limitStr.isEmpty()) {
+                Toast.makeText(this, "Nhập số lượng câu!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            questionLimit = Integer.parseInt(limitStr);
 
         } catch (Exception e) {
-            Toast.makeText(this, "Lỗi đầu vào: Vui lòng kiểm tra và nhập lại.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi nhập liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // --- Gọi ViewModel ---
-        final Observer<List<Question>> quizObserver = new Observer<List<Question>>() {
-            @Override
-            public void onChanged(List<Question> questions) {
-                questionViewModel.getQuizQuestions(selectedTopic, selectedLevel, questionLimit).removeObserver(this);
+        Toast.makeText(this, "Đang lấy dữ liệu...", Toast.LENGTH_SHORT).show();
 
-                if (questions != null && !questions.isEmpty()) {
-                    exportQuestionsToCSV(questions);
-                } else {
-                    Toast.makeText(TaoBoDe.this, "Không tìm thấy câu hỏi nào phù hợp.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-
+        // Gọi ViewModel
+        int finalSelectedLevel = selectedLevel;
         questionViewModel.getQuizQuestions(selectedTopic, selectedLevel, questionLimit)
-                .observe(this, quizObserver);
+                .observe(this, new Observer<List<Question>>() {
+                    @Override
+                    public void onChanged(List<Question> questions) {
+                        // Xóa observer
+                        questionViewModel.getQuizQuestions(selectedTopic, finalSelectedLevel, questionLimit).removeObserver(this);
+
+                        if (questions != null && !questions.isEmpty()) {
+                            exportQuestionsToCSV(questions);
+                        } else {
+                            Toast.makeText(TaoBoDe.this, "Không tìm thấy câu hỏi phù hợp.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
-
-    /**
-     * Ghi List<Question> ra file CSV theo định dạng cho Quizizz.
-     */
+    // --- CÁC HÀM HỖ TRỢ XUẤT FILE (GIỮ NGUYÊN) ---
     private void exportQuestionsToCSV(List<Question> questions) {
         File directory = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        if (directory == null) {
-            Toast.makeText(this, "Không thể truy cập bộ nhớ ngoài.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        String fileName = "Quizizz_Export_" + System.currentTimeMillis() + ".csv";
+        String fileName = "Quizizz_" + System.currentTimeMillis() + ".csv";
         File file = new File(directory, fileName);
 
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write("Question Text,Option 1,Option 2,Option 3,Option 4,Correct Answer\n");
-
+            writer.write("Question Text,Option 1,Option 2,Option 3,Option 4,Correct Answer,Time in seconds\n");
             for (Question q : questions) {
-                // SỬ DỤNG PHƯƠNG THỨC safeString ĐỂ TRÁNH LỖI NULL
-                String content = safeString(q.getContent());
-                String answer = safeString(q.getCorrectAnswer());
-
-                // >> LỖI Cannot resolve method 'getOptionX' <<
-                // ĐÃ SỬA: Cần đảm bảo Question Model có các phương thức này
-                String option1 = safeString(q.getOption1());
-                String option2 = safeString(q.getOption2());
-                String option3 = safeString(q.getOption3());
-                String option4 = safeString(q.getOption4());
-
-                // Escape các ký tự đặc biệt
-                option1 = option1.replace("\"", "\"\"");
-                option2 = option2.replace("\"", "\"\"");
-                option3 = option3.replace("\"", "\"\"");
-                option4 = option4.replace("\"", "\"\"");
-
-                String line = String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
-                        content.replace("\"", "\"\""),
-                        option1, option2, option3, option4,
-                        answer.replace("\"", "\"\""));
+                String line = String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"30\"\n",
+                        safeString(q.getContent()), safeString(q.getOption1()), safeString(q.getOption2()),
+                        safeString(q.getOption3()), safeString(q.getOption4()), safeString(q.getCorrectAnswer()));
                 writer.write(line);
             }
-
-            Toast.makeText(this, "✅ Xuất file thành công: " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
             openQuizizzUploadPage(file.getAbsolutePath());
-
         } catch (Exception e) {
             Log.e("TaoBoDe", "Lỗi xuất file", e);
-            Toast.makeText(this, "❌ Lỗi xuất file: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Lỗi tạo file!", Toast.LENGTH_LONG).show();
         }
     }
 
-    /**
-     * Phương thức tiện ích để tránh NullPointerException khi truy cập các trường của Model.
-     */
     private String safeString(String value) {
-        return value != null ? value : "";
+        return value != null ? value.replace("\"", "\"\"") : "";
     }
 
-    /**
-     * Mở trình duyệt đến trang Upload Quizizz.
-     */
     private void openQuizizzUploadPage(String filePath) {
-        String quizizzUploadUrl = "https://quizizz.com/create-quiz/questions";
-
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(quizizzUploadUrl));
-
-        if (browserIntent.resolveActivity(getPackageManager()) != null) {
-            startActivity(browserIntent);
-            Toast.makeText(this,
-                    "➡️ TẢI LÊN file: " + filePath + " trên trang Quizizz vừa mở.",
-                    Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Không tìm thấy ứng dụng trình duyệt.", Toast.LENGTH_LONG).show();
-        }
+        new AlertDialog.Builder(this)
+                .setTitle("Thành công")
+                .setMessage("File lưu tại:\n" + filePath)
+                .setPositiveButton("Mở Web", (d, w) -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://quizizz.com/create-quiz"));
+                    try { startActivity(intent); } catch (Exception e) {}
+                })
+                .setNegativeButton("Đóng", null)
+                .show();
     }
 }

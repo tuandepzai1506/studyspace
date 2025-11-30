@@ -101,7 +101,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 2"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -112,7 +112,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 3"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -123,7 +123,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 4"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -134,7 +134,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 5"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -145,7 +145,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 6"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -156,7 +156,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 7"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -167,7 +167,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 8"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -178,7 +178,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 9"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -189,7 +189,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 10"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -200,7 +200,7 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 11"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
@@ -211,44 +211,14 @@
                             android:layout_height="46dp"
                             android:fontFamily="@font/quicksand"
                             android:gravity="center_vertical"
-                            android:text="Bộ 1"
+                            android:text="Bộ 12"
                             android:textColor="@color/black"
                             android:textFontWeight="900">
 
                         </TextView>
 
-                        <Spinner
-                            android:id="@+id/spinner_topic"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/spinner_border"
-                            android:layout_marginBottom="8dp"/>
 
-                        <Spinner
-                            android:id="@+id/spinner_level"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/spinner_border"
-                            android:layout_marginBottom="8dp"/>
 
-                        <EditText
-                            android:id="@+id/edittext_limit"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:hint="Số lượng câu hỏi (ví dụ: 20)"
-                            android:inputType="number"
-                            android:padding="10dp"
-                            android:background="@drawable/edittext_border"
-                            android:layout_marginBottom="16dp"/>
-
-                        <Button
-                            android:id="@+id/button_create_quiz"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Tạo &amp; Xuất File CSV"
-                            android:fontFamily="@font/quicksand"
-                            android:textStyle="bold"
-                            app:cornerRadius="8dp"/>
 
                     </LinearLayout>
                 </androidx.core.widget.NestedScrollView>
@@ -270,5 +240,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/materialCardView"
         app:layout_constraintEnd_toEndOf="@+id/materialCardView"
         tools:ignore="MissingConstraints" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,92 +1,91 @@
 package com.example.studyspace;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.cardview.widget.CardView;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.Toast; // Thêm Toast để thông báo lỗi nếu có
+
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-
+import androidx.cardview.widget.CardView;
 
 public class MainActivity extends AppCompatActivity {
-    private Button buttonQuestionBank;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_main_act);
-        buttonQuestionBank = findViewById(R.id.button_question_bank);
+        setContentView(R.layout.layout_main_act); // Đảm bảo tên file layout này đúng
+
+        // 1. Xử lý nút Ngân hàng câu hỏi
+        CardView buttonQuestionBank = findViewById(R.id.button_question_bank);
         if (buttonQuestionBank != null) {
-
             buttonQuestionBank.setOnClickListener(v -> {
-
                 Intent intent = new Intent(MainActivity.this, QuestionManagementActivity.class);
                 startActivity(intent);
             });
         }
-        ImageView add = (ImageView) findViewById(R.id.add);
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    // 1. Tải và chạy Animation
+
+        // 2. Xử lý nút "add" (ImageView)
+        ImageView add = findViewById(R.id.add);
+        if (add != null) {
+            add.setOnClickListener(v -> {
+                try {
                     Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
                     v.startAnimation(flashAnim);
 
-                    // 2. Chuyển Activity sau khi Animation kết thúc
                     flashAnim.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation animation) {}
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
-                            Intent intent = new Intent();
-                            intent.setClass(getApplicationContext(), createQuizizz.class);
+                            Intent intent = new Intent(MainActivity.this, createQuizizz.class);
                             startActivity(intent);
                         }
 
                         @Override
                         public void onAnimationRepeat(Animation animation) {}
                     });
-                };
+                } catch (Exception e) {
+                    // Nếu thiếu file animation thì vẫn chuyển trang được
+                    Intent intent = new Intent(MainActivity.this, createQuizizz.class);
+                    startActivity(intent);
+                }
             });
-        CardView makeTest = (CardView) findViewById(R.id.makeTest);
-        makeTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
-                v.startAnimation(flashAnim);
+        } else {
+            // Log lỗi nếu không tìm thấy ID
+            System.out.println("Lỗi: Không tìm thấy ID 'add' trong layout");
+        }
 
-                flashAnim.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {}
+        // 3. Xử lý nút "makeTest" (CardView)
+        CardView makeTest = findViewById(R.id.makeTest);
+        if (makeTest != null) {
+            makeTest.setOnClickListener(v -> {
+                try {
+                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
+                    v.startAnimation(flashAnim);
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        Intent intent = new Intent(MainActivity.this, TaoBoDe.class);
-                        startActivity(intent);
-                    }
+                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
 
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {}
-                });
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            Intent intent = new Intent(MainActivity.this, TaoBoDe.class);
+                            startActivity(intent);
+                        }
 
-            }
-        });
-    }  // <-- Chỉ còn 1 dấu đóng onCreate
-}      // <-- đóng class
-
-
-
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                    });
+                } catch (Exception e) {
+                    Intent intent = new Intent(MainActivity.this, TaoBoDe.class);
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+}
