@@ -36,7 +36,8 @@
         <activity
             android:name=".createQuizizz"
             android:exported="false" />
-
+        <activity android:name=".Question_Bank"
+            android:exported="false"/>
     </application>
 
 </manifest>

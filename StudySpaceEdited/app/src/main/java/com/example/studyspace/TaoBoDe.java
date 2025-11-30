@@ -39,7 +39,7 @@ public class TaoBoDe extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tao_bo_de); // Đảm bảo file layout đúng tên
+        setContentView(R.layout.tao_bo_de);
 
         questionViewModel = new ViewModelProvider(this).get(QuestionViewModel.class);
         ImageView add = findViewById(R.id.add);
@@ -51,15 +51,10 @@ public class TaoBoDe extends AppCompatActivity {
         }
 
         try {
-            // Ánh xạ View
             spinnerTopic = findViewById(R.id.spinner_topic);
             spinnerLevel = findViewById(R.id.spinner_level);
             editTextLimit = findViewById(R.id.edittext_limit);
             buttonCreateQuiz = findViewById(R.id.button_create_file);
-
-
-
-
             // Sự kiện nút Tạo Đề
             if (buttonCreateQuiz != null) {
                 buttonCreateQuiz.setOnClickListener(v -> taoBoDe());
@@ -69,18 +64,11 @@ public class TaoBoDe extends AppCompatActivity {
             Toast.makeText(this, "Lỗi UI: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
-    // --- KẾT THÚC ONCREATE TẠI ĐÂY ---
-
-    /**
-     * Hàm cấu hình dữ liệu cho Spinner (Phải viết ngoài onCreate)
-     */
-
-
     /**
      * Hàm hiển thị Popup khi bấm nút Add
      */
     private void showAddPopup() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(TaoBoDe.this); // Sửa context thành TaoBoDe.this
+        AlertDialog.Builder builder = new AlertDialog.Builder(TaoBoDe.this);
 
         // Nạp giao diện popup
         View popupView = LayoutInflater.from(this).inflate(R.layout.popup_makefile, null);
@@ -111,11 +99,7 @@ public class TaoBoDe extends AppCompatActivity {
             dialog.dismiss();
 
             Toast.makeText(TaoBoDe.this, "Bạn chọn: " + selectedSource, Toast.LENGTH_SHORT).show();
-
-            // Logic chuyển trang (Nếu cần)
             if (selectedSource.equals("Lấy theo chủ đề")) {
-                // Ví dụ: Reset lại màn hình hiện tại hoặc làm gì đó
-                // Code cũ của bạn intent gọi chính nó là không cần thiết lắm
             }
         });
     }
@@ -130,8 +114,6 @@ public class TaoBoDe extends AppCompatActivity {
 
         try {
             selectedTopic = spinnerTopic.getSelectedItem().toString();
-
-            // SỬA LỖI LOGIC: Chuyển chữ "DỄ/KHÓ" thành số 1/2/3
             String levelStr = spinnerLevel.getSelectedItem().toString();
             if (levelStr.equals("TRUNG BÌNH")) selectedLevel = 2;
             if (levelStr.equals("KHÓ")) selectedLevel = 3;
@@ -147,8 +129,6 @@ public class TaoBoDe extends AppCompatActivity {
             Toast.makeText(this, "Lỗi nhập liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             return;
         }
-
-        Toast.makeText(this, "Đang lấy dữ liệu...", Toast.LENGTH_SHORT).show();
 
         // Gọi ViewModel
         int finalSelectedLevel = selectedLevel;
@@ -168,7 +148,7 @@ public class TaoBoDe extends AppCompatActivity {
                 });
     }
 
-    // --- CÁC HÀM HỖ TRỢ XUẤT FILE (GIỮ NGUYÊN) ---
+    // --- CÁC HÀM HỖ TRỢ XUẤT FILE ---
     private void exportQuestionsToCSV(List<Question> questions) {
         File directory = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         String fileName = "Quizizz_" + System.currentTimeMillis() + ".csv";
