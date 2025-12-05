@@ -113,5 +113,57 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+        CardView classCreate = findViewById(R.id.classCreate);
+        if (classCreate != null){
+            classCreate.setOnClickListener(v ->{
+                try {
+                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
+                    v.startAnimation(flashAnim);
+
+                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            Intent intent = new Intent(MainActivity.this, createClass.class);
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                    });
+                } catch (Exception e) {
+                    Intent intent = new Intent(MainActivity.this, createClass.class);
+                    startActivity(intent);
+                }
+            });
+        }
+        CardView bangDiem = findViewById(R.id.bangDiem);
+        if (bangDiem != null){
+            bangDiem.setOnClickListener(v ->{
+                try {
+                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
+                    v.startAnimation(flashAnim);
+
+                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
+
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            Intent intent = new Intent(MainActivity.this, scoreTable.class);
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                    });
+                } catch (Exception e) {
+                    Intent intent = new Intent(MainActivity.this, scoreTable.class);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 }

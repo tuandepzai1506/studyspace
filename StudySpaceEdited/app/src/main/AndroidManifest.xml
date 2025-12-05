@@ -38,6 +38,10 @@
             android:exported="false" />
         <activity android:name=".Question_Bank"
             android:exported="false"/>
+        <activity android:name=".createClass"
+            android:exported="false"/>
+        <activity android:name=".scoreTable"
+            android:exported="false"/>
     </application>
 
 </manifest>
