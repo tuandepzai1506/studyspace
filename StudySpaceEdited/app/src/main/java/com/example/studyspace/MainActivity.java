@@ -2,168 +2,126 @@ package com.example.studyspace;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast; // Thêm Toast để thông báo lỗi nếu có
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
+
+    // Khai báo biến toàn cục để quản lý dễ hơn
+    private DrawerLayout drawerLayout;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_main_act); // Đảm bảo tên file layout này đúng
+        setContentView(R.layout.layout_main_act);
+        // Khởi tạo Drawer và BottomNavigation
+        drawerLayout = findViewById(R.id.drawer_layout);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        // 1. Xử lý nút Ngân hàng câu hỏi
-        CardView buttonQuestionBank = findViewById(R.id.button_question_bank);
-        if (buttonQuestionBank != null) {
-            buttonQuestionBank.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity.this, QuestionManagementActivity.class);
-                startActivity(intent);
-            });
-        }
-
-        // 2. Xử lý nút "add" (ImageView)
+        // Nút Add (ImageView)
         ImageView add = findViewById(R.id.add);
         if (add != null) {
             add.setOnClickListener(v -> {
-                try {
-                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
-                    v.startAnimation(flashAnim);
-
-                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {}
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            Intent intent = new Intent(MainActivity.this, createQuizizz.class);
-                            startActivity(intent);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                } catch (Exception e) {
-                    // Nếu thiếu file animation thì vẫn chuyển trang được
-                    Intent intent = new Intent(MainActivity.this, createQuizizz.class);
-                    startActivity(intent);
-                }
+                runAnimationAndSwitchActivity(v, createQuizizz.class);
             });
-        } else {
-            // Log lỗi nếu không tìm thấy ID
-            System.out.println("Lỗi: Không tìm thấy ID 'add' trong layout");
         }
-
-        // 3. Xử lý nút "makeTest" (CardView)
+        // Nút Tạo bộ đề (CardView)
         CardView makeTest = findViewById(R.id.makeTest);
         if (makeTest != null) {
             makeTest.setOnClickListener(v -> {
-                try {
-                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
-                    v.startAnimation(flashAnim);
-
-                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {}
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            Intent intent = new Intent(MainActivity.this, TaoBoDe.class);
-                            startActivity(intent);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                } catch (Exception e) {
-                    Intent intent = new Intent(MainActivity.this, TaoBoDe.class);
-                    startActivity(intent);
-                }
+                runAnimationAndSwitchActivity(v, TaoBoDe.class);
             });
         }
+        // Nút Ngân hàng câu hỏi (CardView)
         CardView qs_bank = findViewById(R.id.button_question_bank);
         if (qs_bank != null){
             qs_bank.setOnClickListener(v ->{
-                try {
-                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
-                    v.startAnimation(flashAnim);
-
-                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {}
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            Intent intent = new Intent(MainActivity.this, Question_Bank.class);
-                            startActivity(intent);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                } catch (Exception e) {
-                    Intent intent = new Intent(MainActivity.this, Question_Bank.class);
-                    startActivity(intent);
-                }
+                runAnimationAndSwitchActivity(v, Question_Bank.class);
             });
         }
+
+        // Nút Tạo lớp (CardView)
         CardView classCreate = findViewById(R.id.classCreate);
         if (classCreate != null){
             classCreate.setOnClickListener(v ->{
-                try {
-                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
-                    v.startAnimation(flashAnim);
-
-                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {}
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            Intent intent = new Intent(MainActivity.this, createClass.class);
-                            startActivity(intent);
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                } catch (Exception e) {
-                    Intent intent = new Intent(MainActivity.this, createClass.class);
-                    startActivity(intent);
-                }
+                runAnimationAndSwitchActivity(v, createClass.class);
             });
         }
+
+        // Nút Bảng điểm (CardView)
         CardView bangDiem = findViewById(R.id.bangDiem);
         if (bangDiem != null){
             bangDiem.setOnClickListener(v ->{
-                try {
-                    Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
-                    v.startAnimation(flashAnim);
+                runAnimationAndSwitchActivity(v, scoreTable.class);
+            });
+        }
 
-                    flashAnim.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {}
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            Intent intent = new Intent(MainActivity.this, scoreTable.class);
-                            startActivity(intent);
+        // --- XỬ LÝ MENU BOTTOM ---
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    int id = item.getItemId();
+                    if (id == R.id.nav_profile) {
+                        if (drawerLayout != null) {
+                            drawerLayout.openDrawer(GravityCompat.END);
+                            return true;
+                        } else {
+                            Toast.makeText(MainActivity.this, "Lỗi: Không tìm thấy ID drawer_layout trong XML!", Toast.LENGTH_LONG).show();
+                            return false;
                         }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {}
-                    });
-                } catch (Exception e) {
-                    Intent intent = new Intent(MainActivity.this, scoreTable.class);
-                    startActivity(intent);
+                    } else if (id == R.id.nav_quizizz) {
+                        Intent intent = new Intent(MainActivity.this, createQuizizz.class);
+                        startActivity(intent);
+                        return true;
+                    }else if (id == R.id.nav_class) {
+                        Intent intent = new Intent(MainActivity.this, classroom.class);
+                        startActivity(intent);
+                        return true;
+                    }
+                    return false;
                 }
             });
+        } else {
+            Toast.makeText(MainActivity.this, "Lỗi: Không tìm thấy BottomNavigation!", Toast.LENGTH_SHORT).show();
+        }
+    }
+    // Hàm phụ để xử lý animation và chuyển trang
+    private void runAnimationAndSwitchActivity(android.view.View v, Class<?> destinationActivity) {
+        try {
+            Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
+            v.startAnimation(flashAnim);
+
+            flashAnim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {}
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    Intent intent = new Intent(MainActivity.this, destinationActivity);
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {}
+            });
+        } catch (Exception e) {
+            // Nếu lỗi animation thì chuyển trang luôn
+            Intent intent = new Intent(MainActivity.this, destinationActivity);
+            startActivity(intent);
         }
     }
 }
