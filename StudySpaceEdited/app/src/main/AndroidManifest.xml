@@ -48,6 +48,8 @@
         <activity
             android:name=".AddEditQuestionActivity"
             android:exported="false" />
+        <activity android:name=".login"
+            android:exported="false"/>
     </application>
 
 </manifest>

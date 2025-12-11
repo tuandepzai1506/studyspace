@@ -81,7 +81,7 @@ public class Question_Bank extends AppCompatActivity {
             }
         });
 
-        // --- Xử lý nút thêm mới (FloatingActionButton) ---
+        // --- Xử lý nút thêm mới ---
         FloatingActionButton fabAdd = findViewById(R.id.fab_add_question);
         fabAdd.setOnClickListener(view -> {
             // Mở màn hình AddEditQuestionActivity để thêm mới
@@ -89,5 +89,4 @@ public class Question_Bank extends AppCompatActivity {
             startActivity(intent);
         });
     }
-    // XÓA TẤT CẢ CODE BỊ THỪA TỪ ĐÂY TRỞ XUỐNG
 }

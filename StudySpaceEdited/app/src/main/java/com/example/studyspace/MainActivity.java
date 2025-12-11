@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -68,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
                 runAnimationAndSwitchActivity(v, scoreTable.class);
             });
         }
+        Button btn_logout = findViewById(R.id.btn_logout);
+        if (btn_logout != null) {
+            btn_logout.setOnClickListener(v -> {
+                    runAnimationAndSwitchActivity(v, login.class);
+            });
+        }
+
 
         // --- XỬ LÝ MENU BOTTOM ---
         if (bottomNavigationView != null) {

@@ -1,4 +1,6 @@
 package com.example.studyspace;
 
-public class logup {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class logup extends AppCompatActivity {
 }
