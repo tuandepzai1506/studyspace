@@ -46,7 +46,7 @@ public class TaoBoDe extends AppCompatActivity {
         if (add != null) {
             add.setOnClickListener(v -> showAddPopup());
         } else {
-            // Kiểm tra xem có tìm thấy nút không
+            // Kiểm tra
             Log.e("TaoBoDe", "Không tìm thấy nút Add!");
         }
 
