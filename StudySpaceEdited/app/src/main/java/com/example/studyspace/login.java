@@ -34,9 +34,9 @@ public class login extends AppCompatActivity {
 
         // Xử lý sự kiện chuyển sang màn hình Đăng ký
         tvRegister.setOnClickListener(v -> {
-            Toast.makeText(this, "Chuyển sang màn hình Đăng ký", Toast.LENGTH_SHORT).show();
-            // TODO: Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            // startActivity(intent);
+            Intent myIntent = new Intent(login.this, logup.class);
+            startActivity(myIntent);
+
         });
     }
 
@@ -44,7 +44,7 @@ public class login extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // 1. Kiểm tra dữ liệu đầu vào (Validate)
+        // Kiểm tra dữ liệu đầu vào (Validate)
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Vui lòng nhập Email");
             etEmail.requestFocus();
@@ -57,15 +57,14 @@ public class login extends AppCompatActivity {
             return;
         }
 
-        // 2. TODO: Gọi API hoặc kiểm tra Database ở đây (Firebase / SQL)
-        // Đây là code giả lập đăng nhập thành công:
+        // TODO: Gọi API hoặc kiểm tra Database ở đây (Firebase / SQL)
         if (email.equals("admin@gmail.com") && password.equals("123456")) {
             Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
-            // Chuyển sang màn hình Ngân hàng câu hỏi
+
             Intent intent = new Intent(login.this, MainActivity.class);
             startActivity(intent);
-            finish(); // Đóng LoginActivity để user không back lại được
+            finish();
         } else {
             Toast.makeText(this, "Email hoặc mật khẩu sai!", Toast.LENGTH_SHORT).show();
         }

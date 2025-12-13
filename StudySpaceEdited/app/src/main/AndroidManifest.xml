@@ -3,6 +3,8 @@
     package="com.example.studyspace">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -49,6 +51,10 @@
             android:name=".AddEditQuestionActivity"
             android:exported="false" />
         <activity android:name=".login"
+            android:exported="false"/>
+        <activity android:name=".logup"
+            android:exported="false"/>
+        <activity android:name=".FaceRegistrationActivity"
             android:exported="false"/>
     </application>
 
