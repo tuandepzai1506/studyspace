@@ -54,10 +54,7 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-    implementation(libs.firebase.crashlytics.buildtools)
-    implementation("com.google.guava:guava:32.1.2-android")
-    implementation("com.google.mlkit:face-detection:16.1.6")
-
+    implementation("com.google.code.gson:gson:2.10.1")
     // --- TEST ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
@@ -71,6 +68,7 @@ dependencies {
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
 
+    //  Dùng annotationProcessor thay vì kapt khi code Java
     annotationProcessor("androidx.room:room-compiler:$room_version")
 
     // --- FIREBASE ---
@@ -87,23 +85,4 @@ dependencies {
     val lifecycle_version = "2.7.0"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    val camerax_version = "1.3.1"
-    implementation("androidx.camera:camera-core:$camerax_version")
-    implementation("androidx.camera:camera-camera2:$camerax_version")
-    implementation("androidx.camera:camera-lifecycle:$camerax_version")
-    implementation("androidx.camera:camera-view:$camerax_version")
-
-    // 2. Google ML Kit: Để phát hiện khuôn mặt (Face Detection) trong khung hình
-    implementation("com.google.mlkit:face-detection:16.1.6")
-
-    // 3. TensorFlow Lite: Để chạy model AI so sánh khuôn mặt (Face Embedding)
-    implementation("org.tensorflow:tensorflow-lite:2.14.0")
-    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
-    // (Tùy chọn) Thêm GPU delegate nếu muốn xử lý nhanh hơn
-    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
-    implementation("androidx.camera:camera-camera2:1.3.1")
-    implementation("androidx.camera:camera-lifecycle:1.3.1")
-    implementation("androidx.camera:camera-view:1.3.1")
-    implementation("com.google.mlkit:face-detection:16.1.6")
-    // --- KẾT THÚC PHẦN BỔ SUNG ---
 }

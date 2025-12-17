@@ -19,13 +19,7 @@ public class QuestionViewModel extends ViewModel {
     private static final String TAG = "QuestionViewModel";
     private static final String COLLECTION_NAME = "questions";
 
-    /**
-     * Lấy một danh sách câu hỏi giới hạn cho bài trắc nghiệm (quiz).
-     * @param topic Chủ đề câu hỏi.
-     * @param level Độ khó của câu hỏi.
-     * @param limit Số lượng câu hỏi tối đa cần lấy.
-     * @return LiveData chứa danh sách câu hỏi hoặc null nếu có lỗi.
-     */
+
     public LiveData<List<Question>> getQuizQuestions(String topic, int level, int limit) {
         MutableLiveData<List<Question>> questionsLiveData = new MutableLiveData<>();
 
@@ -52,10 +46,7 @@ public class QuestionViewModel extends ViewModel {
         return questionsLiveData;
     }
 
-    /**
-     * Lấy TẤT CẢ các câu hỏi từ Firestore để quản lý trong ngân hàng câu hỏi.
-     * @return LiveData chứa danh sách tất cả câu hỏi.
-     */
+
     public LiveData<List<Question>> getAllQuestions() {
         MutableLiveData<List<Question>> questionsLiveData = new MutableLiveData<>();
         db.collection(COLLECTION_NAME)
@@ -131,4 +122,5 @@ public class QuestionViewModel extends ViewModel {
         void onSaveSuccess();
         void onSaveFailure(Exception e);
     }
+
 }

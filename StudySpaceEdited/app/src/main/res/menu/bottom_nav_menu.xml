@@ -1,20 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/nav_home"
-        android:title="Home"
-        android:icon="@drawable/ic_home"/>
+    <!-- Bạn cần tạo icon ic_home trong thư mục drawable -->
+    <item
+        android:id="@+id/action_home"
+        android:icon="@drawable/ic_home"
+        android:title="Trang chủ" />
 
-    <item android:id="@+id/nav_quizizz"
-        android:title="Quizizz"
-        android:icon="@drawable/ic_quiz"/>
+    <!-- Bạn cần tạo icon ic_question_bank trong thư mục drawable -->
+    <item
+        android:id="@+id/action_question_bank"
+        android:icon="@drawable/ic_question_bank"
+        android:title="Ngân hàng" />
 
-    <item android:id="@+id/nav_class"
-        android:title="Class"
-        android:icon="@drawable/lophoc"/>
+    <!-- Bạn cần tạo icon ic_create trong thư mục drawable -->
+    <item
+        android:id="@+id/action_create_quiz"
+        android:icon="@drawable/ic_create"
+        android:title="Tạo đề" />
+    <item
+        android:id="@+id/nav_quizizz"
+        android:icon="@drawable/ic_quiz"
+        android:title="Quizizz" />
 
-    <item android:id="@+id/nav_profile"
-        android:title="Profile"
-        android:icon="@drawable/ic_profile"/>
+    <!-- Item cho Lớp học (Item còn thiếu) -->
+    <item
+        android:id="@+id/nav_class"
+        android:icon="@drawable/ic_class"
+        android:title="Lớp học" />
 
+    <!-- Item cho Hồ sơ (Profile) -->
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_profile"
+        android:title="Hồ sơ" />
 </menu>
