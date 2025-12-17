@@ -100,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         return true;
                     }
+                    else if (id == R.id.nav_home){
+                        Intent intent = new Intent (MainActivity.this, MainActivity.class);
+                    }
                     return false;
                 }
             });

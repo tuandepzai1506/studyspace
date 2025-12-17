@@ -35,6 +35,7 @@ public class TaoBoDe extends AppCompatActivity {
     private Spinner spinnerLevel;
     private EditText editTextLimit;
     private Button buttonCreateQuiz;
+    private EditText fileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,7 @@ public class TaoBoDe extends AppCompatActivity {
         }
 
         try {
+            fileName = findViewById(R.id.fileName);
             spinnerTopic = findViewById(R.id.spinner_topic);
             spinnerLevel = findViewById(R.id.spinner_level);
             editTextLimit = findViewById(R.id.edittext_limit);

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionViewModel extends ViewModel {
-
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "QuestionViewModel";
     private static final String COLLECTION_NAME = "questions";

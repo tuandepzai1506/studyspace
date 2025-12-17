@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -42,20 +41,16 @@ public class createClass extends AppCompatActivity {
         }
     private void showClassPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(createClass.this);
-
         // Nạp giao diện popup
         View popupView = LayoutInflater.from(this).inflate(R.layout.popup_class, null);
         builder.setView(popupView);
-
         AlertDialog dialog = builder.create();
         dialog.show();
-
         // Ánh xạ View trong Popup
         EditText edittext_limit1 = popupView.findViewById(R.id.edittext_limit1);
         EditText edittext_limit2 = popupView.findViewById(R.id.edittext_limit2);
         EditText edittext_limit3 = popupView.findViewById(R.id.edittext_limit3);
         Button btnCreateClass = popupView.findViewById(R.id.button_create_class);
-
     }
 
 }
