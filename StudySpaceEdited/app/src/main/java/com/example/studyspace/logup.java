@@ -38,11 +38,6 @@ public class logup extends AppCompatActivity {
                     }
             );
         }
-        if (btnContinue != null) {
-            btnContinue.setOnClickListener(v ->{
-                runAnimationAndSwitchActivity(v, FaceRegistrationActivity.class);
-            } );
-        }
     }
     private void handleLogup() {
         // Lấy dữ liệu
