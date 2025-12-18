@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioGroup; // MỚI: Import RadioGroup
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -28,8 +29,8 @@ public class AddEditQuestionActivity extends AppCompatActivity {
     private Spinner spinnerLevel;
     private Button btnSave;
 
-    // TODO: Thêm biến để xử lý chế độ Sửa
-    // private String currentQuestionId = null;
+    // MỚI: Khai báo biến RadioGroup để chọn đáp án đúng
+    private RadioGroup rgCorrectAnswer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,10 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         etTopic = findViewById(R.id.edit_text_topic);
         spinnerLevel = findViewById(R.id.spinner_level);
         btnSave = findViewById(R.id.button_save);
+
+        // MỚI: Ánh xạ RadioGroup (ID phải trùng với file XML vừa sửa)
+        rgCorrectAnswer = findViewById(R.id.rg_correct_answer);
+
         MaterialToolbar toolbar = findViewById(R.id.toolbar_add_edit);
 
         // Thiết lập Spinner cho độ khó
@@ -60,7 +65,7 @@ public class AddEditQuestionActivity extends AppCompatActivity {
     }
 
     private void setupLevelSpinner() {
-        // Tạo dữ liệu cho Spinner
+        // Tạo dữ liệu cho Spinner (Độ khó 1-5)
         Integer[] levels = new Integer[]{1, 2, 3, 4, 5};
         ArrayAdapter<Integer> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, levels);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -77,43 +82,56 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         int level = (Integer) spinnerLevel.getSelectedItem();
 
         Log.d(TAG, "== BẮT ĐẦU LƯU ==");
-        Log.d(TAG, "Nội dung: " + questionText);
-        Log.d(TAG, "Đáp án 1: " + option1);
-        Log.d(TAG, "Chủ đề: " + topic);
 
-        // Kiểm tra dữ liệu đầu vào
+        // 1. Kiểm tra dữ liệu đầu vào cơ bản
         if (TextUtils.isEmpty(questionText) || TextUtils.isEmpty(option1) || TextUtils.isEmpty(option2) || TextUtils.isEmpty(topic)) {
-            Toast.makeText(this, "Vui lòng nhập đủ các trường bắt buộc", Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Lỗi: Thiếu thông tin bắt buộc.");
+            Toast.makeText(this, "Vui lòng nhập đủ: Câu hỏi, Đáp án A, B và Chủ đề", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Tạo danh sách đáp án một cách linh hoạt
+        // 2. Tạo danh sách đáp án
         List<String> options = new ArrayList<>();
-        options.add(option1);
-        options.add(option2);
-        // Chỉ thêm các đáp án không rỗng
-        if (!option3.isEmpty()) options.add(option3);
-        if (!option4.isEmpty()) options.add(option4);
+        options.add(option1); // Index 0
+        options.add(option2); // Index 1
+        if (!option3.isEmpty()) options.add(option3); // Index 2 (nếu có)
+        if (!option4.isEmpty()) options.add(option4); // Index 3 (nếu có)
 
-        // Tạo đối tượng Question
-        Question newQuestion = new Question(questionText, options, 0, topic, level);
+        // 3. XÁC ĐỊNH ĐÁP ÁN ĐÚNG (Dựa vào RadioGroup)
+        int correctIndex = 0; // Mặc định là A (0)
+        int checkedId = rgCorrectAnswer.getCheckedRadioButtonId();
 
-        // Gọi ViewModel để thêm câu hỏi và truyền vào Listener để xử lý kết quả
+        if (checkedId == R.id.rb_option_b) {
+            correctIndex = 1;
+        } else if (checkedId == R.id.rb_option_c) {
+            correctIndex = 2;
+        } else if (checkedId == R.id.rb_option_d) {
+            correctIndex = 3;
+        }
+
+        // 4. KIỂM TRA LOGIC QUAN TRỌNG:
+        // Nếu chọn đáp án đúng là C (index 2) mà danh sách chỉ có 2 phần tử (A, B) -> Lỗi
+        if (correctIndex >= options.size()) {
+            Toast.makeText(this, "Đáp án đúng bạn chọn (" + (correctIndex == 2 ? "C" : "D") + ") chưa có nội dung!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 5. Tạo đối tượng Question (Truyền correctIndex vào thay vì số 0)
+        Question newQuestion = new Question(questionText, options, correctIndex, topic, level);
+
+        // 6. Gọi ViewModel để lưu
         Log.d(TAG, "Đang gọi questionViewModel.addQuestion...");
         questionViewModel.addQuestion(newQuestion, new QuestionViewModel.OnSaveCompleteListener() {
             @Override
             public void onSaveSuccess() {
-                Log.d(TAG, "LƯU THÀNH CÔNG (nhận callback từ ViewModel).");
+                Log.d(TAG, "LƯU THÀNH CÔNG.");
                 Toast.makeText(AddEditQuestionActivity.this, "Thêm câu hỏi thành công!", Toast.LENGTH_SHORT).show();
-                finish(); // Đóng Activity khi lưu thành công
+                finish();
             }
 
             @Override
             public void onSaveFailure(Exception e) {
-                Log.e(TAG, "LƯU THẤT BẠI (nhận callback từ ViewModel). Lỗi: ", e);
+                Log.e(TAG, "LƯU THẤT BẠI.", e);
                 Toast.makeText(AddEditQuestionActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                // Không đóng Activity khi có lỗi để người dùng có thể thử lại
             }
         });
     }

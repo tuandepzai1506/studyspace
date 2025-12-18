@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Thêm câu hỏi mới"
-            app:navigationIcon="@drawable/ic_close" /> <!-- Tạo icon này -->
+            app:navigationIcon="@drawable/ic_close" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
@@ -31,7 +31,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Nội dung câu hỏi -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -44,12 +43,11 @@
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Các đáp án -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Đáp án 1 (Đáp án đúng)">
+                android:hint="Đáp án A">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_option1"
@@ -61,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Đáp án 2">
+                android:hint="Đáp án B">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_option2"
@@ -73,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Đáp án 3">
+                android:hint="Đáp án C">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_option3"
@@ -85,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:hint="Đáp án 4">
+                android:hint="Đáp án D">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_option4"
@@ -93,7 +91,50 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Chủ đề -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Chọn đáp án đúng:"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#333" />
+
+            <RadioGroup
+                android:id="@+id/rg_correct_answer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical">
+
+                <RadioButton
+                    android:id="@+id/rb_option_a"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="A"
+                    android:checked="true" /> <RadioButton
+                android:id="@+id/rb_option_b"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="B" />
+
+                <RadioButton
+                    android:id="@+id/rb_option_c"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="C" />
+
+                <RadioButton
+                    android:id="@+id/rb_option_d"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="D" />
+            </RadioGroup>
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -106,7 +147,6 @@
                     android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Độ khó -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -127,6 +167,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Lưu câu hỏi" />
+        android:text="Lưu câu hỏi"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
 </LinearLayout>
-    

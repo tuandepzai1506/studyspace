@@ -15,7 +15,7 @@
         android:theme="@style/Theme.StudySpace">
         <!-- Đăng ký Activity để thêm/sửa câu hỏi -->
         <activity
-            android:name=".MainActivity"
+            android:name=".login"
             android:exported="true"
             android:label="Study Space">
             <intent-filter>
@@ -33,10 +33,6 @@
         <activity
             android:name=".TaoBoDe"
             android:exported="false" />
-
-        <activity
-            android:name=".createQuizizz"
-            android:exported="false" />
         <activity android:name=".Question_Bank"
             android:exported="false"/>
         <activity android:name=".createClass"
@@ -51,6 +47,12 @@
         <activity
             android:name=".QuizPreviewActivity"
             android:exported="false" />
+        <activity android:name=".MainActivity"
+            android:exported="false"/>
+        <activity android:name=".logup"
+            android:exported="false"/>
+        <activity android:name=".showClass"
+            android:exported="false"/>
 
     </application>
 

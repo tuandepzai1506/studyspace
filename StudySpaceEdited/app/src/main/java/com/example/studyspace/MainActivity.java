@@ -7,6 +7,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,28 +16,60 @@ import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 public class MainActivity extends AppCompatActivity {
-
-    // Khai báo biến toàn cục để quản lý dễ hơn
     private DrawerLayout drawerLayout;
     private BottomNavigationView bottomNavigationView;
+    FirebaseFirestore db;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_act);
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
         // Khởi tạo Drawer và BottomNavigation
         drawerLayout = findViewById(R.id.drawer_layout);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        TextView username = findViewById(R.id.tv_username);
+        String userId = mAuth.getCurrentUser().getUid();
+
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            String name = documentSnapshot.getString("fullName");
+                            username.setText(name);
+                        }
+                    }
+                });
+        TextView MyEmail = findViewById(R.id.tv_email);
+        String UserEmail = mAuth.getCurrentUser().getEmail();
+        db.collection("users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()){
+                    String email = documentSnapshot.getString("email");
+                    MyEmail.setText(email);
+                }
+            }
+        });
 
         // Nút Add (ImageView)
-        ImageView add = findViewById(R.id.add);
-        if (add != null) {
-            add.setOnClickListener(v -> {
-                runAnimationAndSwitchActivity(v, createQuizizz.class);
+        ImageView createClass = findViewById(R.id.classCreate);
+        if (createClass != null) {
+            createClass.setOnClickListener(v -> {
+                runAnimationAndSwitchActivity(v, createClass.class);
             });
         }
         // Nút Tạo bộ đề (CardView)
@@ -55,10 +88,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Nút Tạo lớp (CardView)
-        CardView classCreate = findViewById(R.id.classCreate);
-        if (classCreate != null){
-            classCreate.setOnClickListener(v ->{
-                runAnimationAndSwitchActivity(v, createClass.class);
+        CardView showClass = findViewById(R.id.showClass);
+        if (showClass != null){
+            showClass.setOnClickListener(v ->{
+                runAnimationAndSwitchActivity(v, showClass.class);
             });
         }
 
@@ -91,10 +124,6 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Lỗi: Không tìm thấy ID drawer_layout trong XML!", Toast.LENGTH_LONG).show();
                             return false;
                         }
-                    } else if (id == R.id.nav_quizizz) {
-                        Intent intent = new Intent(MainActivity.this, createQuizizz.class);
-                        startActivity(intent);
-                        return true;
                     }else if (id == R.id.nav_class) {
                         Intent intent = new Intent(MainActivity.this, classroom.class);
                         startActivity(intent);

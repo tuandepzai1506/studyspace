@@ -37,9 +37,6 @@ public class classroom extends AppCompatActivity {
         chatRecyclerView = findViewById(R.id.chatRecyclerView);
         inputMessage = findViewById(R.id.inputMessage);
         layoutSendBtn = findViewById(R.id.layoutSendBtn);
-
-        // Giả lập tên người nhận
-        textName.setText("Nguyễn Trọng Tuấn");
     }
 
     private void setListeners() {

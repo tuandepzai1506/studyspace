@@ -1,56 +1,111 @@
 package com.example.studyspace;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class createClass extends AppCompatActivity {
-        private EditText editTextLimit1;
-    private EditText editTextLimit2;
-    private EditText editTextLimit3;
-        private Button buttonCreateClass;
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            EdgeToEdge.enable(this);
-            setContentView(R.layout.create_class);
-            Button createClass = findViewById(R.id.create_class);
-            if (createClass != null) {
-                createClass.setOnClickListener(v -> showClassPopup());
-            }
-            try {
-                editTextLimit1 = findViewById(R.id.edittext_limit1);
-                editTextLimit2 = findViewById(R.id.edittext_limit2);
-                editTextLimit3 = findViewById(R.id.edittext_limit3);
-                // Sự kiện nút Tạo Đề
-            } catch (Exception e) {
-                Log.e("TaoLop", "Lỗi khởi tạo UI", e);
-                Toast.makeText(this, "Lỗi UI: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+public class createClass extends AppCompatActivity {
+
+    private Button buttonCreateClassMain;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.create_class);
+
+        // Khởi tạo Firebase
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
+        // Button mở popup
+        buttonCreateClassMain = findViewById(R.id.create_class);
+        if (buttonCreateClassMain != null) {
+            buttonCreateClassMain.setOnClickListener(v -> showClassPopup());
         }
-    private void showClassPopup() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(createClass.this);
-        // Nạp giao diện popup
-        View popupView = LayoutInflater.from(this).inflate(R.layout.popup_class, null);
-        builder.setView(popupView);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        // Ánh xạ View trong Popup
-        EditText edittext_limit1 = popupView.findViewById(R.id.edittext_limit1);
-        EditText edittext_limit2 = popupView.findViewById(R.id.edittext_limit2);
-        EditText edittext_limit3 = popupView.findViewById(R.id.edittext_limit3);
-        Button btnCreateClass = popupView.findViewById(R.id.button_create_class);
     }
 
+    private void showClassPopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        View popupView = LayoutInflater.from(this)
+                .inflate(R.layout.popup_class, null);
+        builder.setView(popupView);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        EditText etClassName = popupView.findViewById(R.id.edittext_limit1);
+        EditText etMember  = popupView.findViewById(R.id.edittext_limit2);
+        Button btnCreate     = popupView.findViewById(R.id.button_create_class);
+
+        btnCreate.setOnClickListener(v -> {
+            String className = etClassName.getText().toString().trim();
+            String member   = etMember.getText().toString().trim();
+
+            if (TextUtils.isEmpty(className)) {
+                etClassName.setError("Vui lòng nhập tên lớp");
+                return;
+            }
+
+            // Gọi hàm tạo lớp
+            createNewClassOnFirebase(className, member, dialog);
+        });
+    }
+
+    private void createNewClassOnFirebase(
+            String className,
+            String member,
+            AlertDialog dialog) {
+
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        // 1. KIỂM TRA ĐĂNG NHẬP (Tránh lỗi Crash nếu user null)
+        if (user == null) {
+            Toast.makeText(this, "Bạn chưa đăng nhập, vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 2. LẤY USER ID (Phần bạn bị thiếu)
+        String userId = user.getUid();
+
+        // 3. Tạo ID cho lớp học
+        String classId = db.collection("classes").document().getId();
+
+        // 4. Tạo đối tượng ClassModel (Giờ biến userId đã có giá trị)
+        ClassModel newClass = new ClassModel(
+                classId,
+                className,
+                member,
+                userId
+        );
+
+        // 5. Lưu lên Firestore
+        db.collection("classes")
+                .document(classId)
+                .set(newClass)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Tạo lớp thành công!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss(); // Đóng popup
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("CreateClass", "Firestore error", e);
+                });
+    }
 }

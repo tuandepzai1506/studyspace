@@ -20,12 +20,11 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/preview_option_1"
+            android:id="@+id/preview_answer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="A. Đáp án 1" />
-        <!-- Thêm các TextView khác cho option 2, 3, 4 nếu cần -->
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

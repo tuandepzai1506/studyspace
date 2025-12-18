@@ -22,34 +22,29 @@ public class Question_Bank extends AppCompatActivity {
 
     private static final String TAG = "Question_Bank";
 
-    // SỬA LỖI: Chỉ khai báo các biến một lần duy nhất
     private QuestionViewModel questionViewModel;
     private QuestionAdapter adapter;
 
-    // Cơ chế mới để xử lý kết quả trả về từ AddEditQuestionActivity
+    // Launcher để hứng kết quả khi thêm/sửa câu hỏi xong
     private final ActivityResultLauncher<Intent> addOrEditQuestionLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                // Kiểm tra xem Activity con có trả về kết quả là "OK" không
                 if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                    // Dữ liệu sẽ được SnapshotListener tự động cập nhật,
-                    // chúng ta chỉ cần hiển thị thông báo nếu muốn.
-                    Log.d(TAG, "Nhận được kết quả OK. Dữ liệu sẽ được cập nhật tự động.");
-                    Toast.makeText(this, "Danh sách đã được cập nhật.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Cập nhật dữ liệu thành công.", Toast.LENGTH_SHORT).show();
+                    // Lưu ý: Dữ liệu sẽ tự động cập nhật nhờ LiveData và Firestore Listener
                 }
             }
     );
 
-    // SỬA LỖI: Chỉ giữ lại một phương thức onCreate duy nhất và hoàn chỉnh
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_bank);
 
-        // --- Khởi tạo ViewModel ---
+        // 1. Khởi tạo ViewModel
         questionViewModel = new ViewModelProvider(this).get(QuestionViewModel.class);
 
-        // --- Thiết lập RecyclerView ---
+        // 2. Thiết lập RecyclerView
         RecyclerView recyclerView = findViewById(R.id.recycler_view_questions);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
@@ -57,68 +52,76 @@ public class Question_Bank extends AppCompatActivity {
         adapter = new QuestionAdapter();
         recyclerView.setAdapter(adapter);
 
-        // --- Lắng nghe LiveData từ ViewModel ---
-        // Giao diện sẽ tự động cập nhật mỗi khi dữ liệu trong LiveData thay đổi
-        questionViewModel.getAllQuestions().observe(this, questions -> {
+        // 3. Quan sát dữ liệu (LiveData)
+        // Bất cứ khi nào Firestore thay đổi, hàm này sẽ chạy và cập nhật giao diện
+        questionViewModel.getQuestionsLiveData().observe(this, questions -> {
             if (questions != null) {
                 adapter.setQuestions(questions);
+                // Hiển thị thông báo nếu danh sách rỗng (tùy chọn)
                 if (questions.isEmpty()) {
-                    Toast.makeText(this, "Chưa có câu hỏi nào trong ngân hàng.", Toast.LENGTH_SHORT).show();
+                    // Log.d(TAG, "Danh sách câu hỏi trống");
                 }
-            } else {
-                Toast.makeText(this, "Lỗi tải danh sách câu hỏi", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // --- Xử lý sự kiện click trên các item ---
+        // 4. Xử lý sự kiện click (Sửa/Xóa)
         adapter.setOnItemClickListener(new QuestionAdapter.OnItemClickListener() {
             @Override
             public void onEditClick(Question question) {
-                // TODO: Triển khai chức năng sửa trong tương lai
-                // Intent intent = new Intent(Question_Bank.this, AddEditQuestionActivity.class);
-                // intent.putExtra("EDIT_QUESTION_ID", question.getId());
-                // addOrEditQuestionLauncher.launch(intent);
-                Toast.makeText(Question_Bank.this, "Chức năng sửa chưa được triển khai", Toast.LENGTH_SHORT).show();
+                // Mở màn hình sửa và truyền ID câu hỏi sang
+                Intent intent = new Intent(Question_Bank.this, AddEditQuestionActivity.class);
+                intent.putExtra("EXTRA_QUESTION_ID", question.getId()); // Gửi ID sang để bên kia biết là Sửa
+                // Bạn cần sửa thêm AddEditQuestionActivity để nhận ID này và hiển thị dữ liệu cũ
+
+                // Tạm thời hiển thị Toast
+                Toast.makeText(Question_Bank.this, "Chức năng sửa đang hoàn thiện", Toast.LENGTH_SHORT).show();
+                // addOrEditQuestionLauncher.launch(intent); // Bỏ comment khi đã code xong phần sửa
             }
 
             @Override
             public void onDeleteClick(Question question) {
-                new AlertDialog.Builder(Question_Bank.this)
-                        .setTitle("Xác nhận xóa")
-                        .setMessage("Bạn có chắc chắn muốn xóa câu hỏi này?")
-                        .setPositiveButton("Xóa", (dialog, which) -> {
-                            // Chỉ cần gọi delete, SnapshotListener sẽ tự động cập nhật UI
-                            questionViewModel.deleteQuestion(question.getId())
-                                    .addOnSuccessListener(aVoid -> Toast.makeText(Question_Bank.this, "Xóa thành công", Toast.LENGTH_SHORT).show())
-                                    .addOnFailureListener(e -> Toast.makeText(Question_Bank.this, "Xóa thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-                        })
-                        .setNegativeButton("Hủy", null)
-                        .show();
+                showDeleteConfirmationDialog(question);
             }
         });
 
-        // --- Xử lý nút thêm mới ---
+        // 5. Nút thêm mới
         FloatingActionButton fabAdd = findViewById(R.id.fab_add_question);
         fabAdd.setOnClickListener(view -> {
             Intent intent = new Intent(Question_Bank.this, AddEditQuestionActivity.class);
-            // Sử dụng Launcher mới để mở Activity
             addOrEditQuestionLauncher.launch(intent);
         });
+    }
+
+    // Hàm hiển thị hộp thoại xác nhận xóa
+    private void showDeleteConfirmationDialog(Question question) {
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc chắn muốn xóa câu hỏi này không?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    deleteQuestion(question);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    // Gọi ViewModel để xóa
+    private void deleteQuestion(Question question) {
+        questionViewModel.deleteQuestion(question.getId())
+                .addOnSuccessListener(aVoid -> Toast.makeText(Question_Bank.this, "Đã xóa câu hỏi", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(Question_Bank.this, "Lỗi khi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Khi Activity bắt đầu được hiển thị, hãy bắt đầu lắng nghe thay đổi từ Firestore
-        Log.d(TAG, "Bắt đầu lắng nghe thay đổi...");
-        questionViewModel.startListeningForQuestionChanges();
+        // Bắt đầu lắng nghe thời gian thực khi màn hình hiện lên
+        questionViewModel.startListening();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        // Khi Activity không còn hiển thị, dừng lắng nghe để tiết kiệm tài nguyên
-        Log.d(TAG, "Dừng lắng nghe thay đổi.");
-        questionViewModel.stopListeningForChanges();
+        // Dừng lắng nghe khi màn hình ẩn đi (để tiết kiệm pin/data)
+        questionViewModel.stopListening();
     }
 }
