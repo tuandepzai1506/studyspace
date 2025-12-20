@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_classes"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Lớp học" />
+    <item
+        android:id="@+id/nav_grades"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="Bảng điểm" />
+    <item
+        android:id="@+id/nav_quiz"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Kiểm tra" />
+</menu>
