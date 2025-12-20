@@ -16,9 +16,17 @@ import java.util.List;
 public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHolder> {
 
     private List<ClassModel> classList;
+    private IClickItemClassListener iClickItemClassListener; // 1. Khai báo biến Listener
 
-    public ClassAdapter(List<ClassModel> classList) {
+    // 2. Định nghĩa Interface để truyền sự kiện ra ngoài
+    public interface IClickItemClassListener {
+        void onClickItemClass(ClassModel classModel);
+    }
+
+    // 3. Cập nhật Constructor để nhận thêm tham số listener
+    public ClassAdapter(List<ClassModel> classList, IClickItemClassListener listener) {
         this.classList = classList;
+        this.iClickItemClassListener = listener;
     }
 
     public void setClassList(List<ClassModel> classList) {
@@ -40,6 +48,15 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
 
         holder.tvClassName.setText(classModel.getClassName());
         holder.tvMember.setText("So luong sinh vien: " + classModel.getMember());
+
+        // 4. Bắt sự kiện click vào item
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Gọi hàm trong interface để Activity xử lý
+                iClickItemClassListener.onClickItemClass(classModel);
+            }
+        });
     }
 
     @Override

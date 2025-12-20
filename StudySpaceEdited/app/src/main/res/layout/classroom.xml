@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        android:text="Nguyễn Trọng Tuấn"
+        android:text="Loading..."
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"

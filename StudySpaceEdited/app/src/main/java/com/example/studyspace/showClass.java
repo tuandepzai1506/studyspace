@@ -1,5 +1,6 @@
 package com.example.studyspace;
 
+import android.content.Intent; // Nhớ import Intent
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -48,15 +49,50 @@ public class showClass extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         mListClass = new ArrayList<>();
-        classAdapter = new ClassAdapter(mListClass);
+
+        // --- PHẦN THAY ĐỔI QUAN TRỌNG Ở ĐÂY ---
+        // Khởi tạo Adapter với Interface lắng nghe sự kiện click
+        classAdapter = new ClassAdapter(mListClass, new ClassAdapter.IClickItemClassListener() {
+            @Override
+            public void onClickItemClass(ClassModel classModel) {
+                // Hàm này sẽ chạy khi người dùng bấm vào 1 lớp học
+                goToChatScreen(classModel);
+            }
+        });
+
         recyclerView.setAdapter(classAdapter);
 
         // Gọi hàm lấy dữ liệu
         getListClassesFromFirebase();
     }
 
+    // Hàm chuyển màn hình sang ChatActivity
+    private void goToChatScreen(ClassModel classModel) {
+        // Kiểm tra xem lớp học có hợp lệ không
+        if (classModel == null || classModel.getClassId() == null) {
+            Toast.makeText(this, "Lỗi: Không tìm thấy ID lớp học", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Tạo Intent để chuyển màn hình
+        // Lưu ý: Bạn cần phải tạo file ChatActivity.java trước thì dòng dưới mới hết báo đỏ
+        Intent intent = new Intent(showClass.this, classroom.class);
+
+        // Đóng gói dữ liệu (ID lớp, Tên lớp) để gửi sang màn hình Chat
+        Bundle bundle = new Bundle();
+        bundle.putString("classId", classModel.getClassId());
+        bundle.putString("className", classModel.getClassName());
+
+        intent.putExtras(bundle);
+
+        // Bắt đầu chuyển màn hình
+        startActivity(intent);
+    }
+
     private void getListClassesFromFirebase() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) return; // Kiểm tra null để tránh lỗi crash
+
         String currentUserId = currentUser.getUid();
 
         db.collection("classes")
@@ -66,12 +102,15 @@ public class showClass extends AppCompatActivity {
                         Log.e("ShowClass", "Lỗi lấy dữ liệu", error);
                         return;
                     }
-
                     if (value != null) {
                         mListClass.clear();
                         for (QueryDocumentSnapshot doc : value) {
                             // Chuyển đổi Document thành Object ClassModel
                             ClassModel classModel = doc.toObject(ClassModel.class);
+
+                            // Đảm bảo lấy đúng ID của document gán vào model (nếu cần)
+                            // classModel.setClassId(doc.getId());
+
                             mListClass.add(classModel);
                         }
 

@@ -53,6 +53,8 @@
             android:exported="false"/>
         <activity android:name=".showClass"
             android:exported="false"/>
+        <activity android:name=".DoQuizActivity"
+            android:exported="false"/>
 
     </application>
 

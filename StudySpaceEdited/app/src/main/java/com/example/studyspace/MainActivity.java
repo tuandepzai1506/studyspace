@@ -125,7 +125,12 @@ public class MainActivity extends AppCompatActivity {
                             return false;
                         }
                     }else if (id == R.id.nav_class) {
-                        Intent intent = new Intent(MainActivity.this, classroom.class);
+                        Intent intent = new Intent(MainActivity.this, showClass.class);
+                        startActivity(intent);
+                        return true;
+                    }
+                    else if (id == R.id.action_home){
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
                         startActivity(intent);
                         return true;
                     }

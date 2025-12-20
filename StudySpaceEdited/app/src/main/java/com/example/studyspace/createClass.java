@@ -75,19 +75,10 @@ public class createClass extends AppCompatActivity {
 
         FirebaseUser user = mAuth.getCurrentUser();
 
-        // 1. KIỂM TRA ĐĂNG NHẬP (Tránh lỗi Crash nếu user null)
-        if (user == null) {
-            Toast.makeText(this, "Bạn chưa đăng nhập, vui lòng đăng nhập lại!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // 2. LẤY USER ID (Phần bạn bị thiếu)
         String userId = user.getUid();
 
-        // 3. Tạo ID cho lớp học
+        // Tạo ID cho lớp học
         String classId = db.collection("classes").document().getId();
-
-        // 4. Tạo đối tượng ClassModel (Giờ biến userId đã có giá trị)
         ClassModel newClass = new ClassModel(
                 classId,
                 className,
@@ -95,7 +86,7 @@ public class createClass extends AppCompatActivity {
                 userId
         );
 
-        // 5. Lưu lên Firestore
+        // Lưu lên Firestore
         db.collection("classes")
                 .document(classId)
                 .set(newClass)
