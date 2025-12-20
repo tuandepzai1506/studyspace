@@ -55,6 +55,8 @@
             android:exported="false"/>
         <activity android:name=".DoQuizActivity"
             android:exported="false"/>
+        <activity android:name=".StudentActivity"
+            android:exported="false"/>
 
     </application>
 
