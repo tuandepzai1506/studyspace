@@ -19,6 +19,7 @@ import com.example.studyspace.viewmodels.QuestionViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,8 @@ public class DoQuizActivity extends AppCompatActivity {
     private int scoreCount = 0; // Số câu đúng
 
     // Biến lưu trữ thông tin để gửi lên Firebase
-    private String currentTopic;
+    private String examId;
+    private String examName;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -46,30 +48,48 @@ public class DoQuizActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_do_quiz);
 
-        // Khởi tạo Firebase
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
         initViews();
 
         // Nhận dữ liệu từ Intent
-        currentTopic = getIntent().getStringExtra("TOPIC"); // Lưu vào biến toàn cục
-        int level = getIntent().getIntExtra("LEVEL", 1);
-        int limit = getIntent().getIntExtra("LIMIT", 10);
+        examId = getIntent().getStringExtra("EXAM_ID");
+        examName = getIntent().getStringExtra("EXAM_NAME");
 
-        tvTitle.setText("Chủ đề: " + currentTopic);
+        // Fallback: Nếu không có EXAM_NAME, tạo từ EXAM_ID
+        if (examName == null || examName.isEmpty()) {
+            examName = "Bộ đề #" + (examId != null ? examId.substring(0, Math.min(8, examId.length())) : "unknown");
+        }
 
-        // Lấy danh sách câu hỏi từ Firebase
+        // Loại bỏ prefix "BỘ ĐỀ: " nếu có
+        if (examName.startsWith("BỘ ĐỀ: ")) {
+            examName = examName.substring(7);
+        }
+
+        if (examId == null || examId.isEmpty()) {
+            Toast.makeText(this, "Lỗi: Không có ID bài thi.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        tvTitle.setText(examName);
+
+        // Lấy danh sách câu hỏi từ Firebase cho bài thi này
         questionViewModel = new ViewModelProvider(this).get(QuestionViewModel.class);
-        questionViewModel.getQuizQuestions(currentTopic, level, limit).observe(this, questions -> {
+        questionViewModel.getQuestionsForExam(examId).addOnSuccessListener(questions -> {
             if (questions != null && !questions.isEmpty()) {
                 mListQuestions = questions;
+                Collections.shuffle(mListQuestions); // Xáo trộn câu hỏi
                 showQuestion(0);
             } else {
-                Toast.makeText(this, "Không tải được câu hỏi hoặc chưa có câu hỏi nào!", Toast.LENGTH_SHORT).show();
-                // Tạm thời không finish() ngay để bạn kịp đọc thông báo lỗi nếu có
-                tvQuestionContent.setText("Lỗi: Không tìm thấy câu hỏi.");
+                Toast.makeText(this, "Không tải được câu hỏi hoặc bài thi này chưa có câu hỏi nào!", Toast.LENGTH_LONG).show();
+                tvQuestionContent.setText("Lỗi: Không tìm thấy câu hỏi cho bài thi này.");
             }
+        }).addOnFailureListener(e -> {
+            Log.e("DoQuizActivity", "Error loading questions", e);
+            Toast.makeText(this, "Lỗi khi tải câu hỏi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            tvQuestionContent.setText("Lỗi: " + e.getMessage());
         });
     }
 
@@ -88,7 +108,7 @@ public class DoQuizActivity extends AppCompatActivity {
     }
 
     private void showQuestion(int index) {
-        if (index >= mListQuestions.size()) {
+        if (mListQuestions == null || index >= mListQuestions.size()) {
             finishQuiz();
             return;
         }
@@ -97,7 +117,6 @@ public class DoQuizActivity extends AppCompatActivity {
         tvQuestionCount.setText("Câu: " + (index + 1) + "/" + mListQuestions.size());
         tvQuestionContent.setText(q.getQuestionText());
 
-        // Reset RadioButton
         radioGroupOptions.clearCheck();
 
         List<String> opts = q.getOptions();
@@ -106,11 +125,9 @@ public class DoQuizActivity extends AppCompatActivity {
         rbOption3.setText(opts.size() > 2 ? opts.get(2) : "");
         rbOption4.setText(opts.size() > 3 ? opts.get(3) : "");
 
-        // Ẩn bớt nếu ít đáp án
         rbOption3.setVisibility(opts.size() > 2 ? View.VISIBLE : View.GONE);
         rbOption4.setVisibility(opts.size() > 3 ? View.VISIBLE : View.GONE);
 
-        // Đổi tên nút ở câu cuối
         if (index == mListQuestions.size() - 1) {
             btnNext.setText("Nộp bài");
         } else {
@@ -124,7 +141,6 @@ public class DoQuizActivity extends AppCompatActivity {
             return;
         }
 
-        // Lấy đáp án người dùng chọn
         int selectedIndex = -1;
         int checkedId = radioGroupOptions.getCheckedRadioButtonId();
         if (checkedId == R.id.rb_option_1) selectedIndex = 0;
@@ -132,46 +148,44 @@ public class DoQuizActivity extends AppCompatActivity {
         else if (checkedId == R.id.rb_option_3) selectedIndex = 2;
         else if (checkedId == R.id.rb_option_4) selectedIndex = 3;
 
-        // So sánh với đáp án đúng
         Question currentQ = mListQuestions.get(currentQuestionIndex);
         if (selectedIndex == currentQ.getCorrectAnswerIndex()) {
             scoreCount++;
         }
 
-        // Chuyển câu tiếp
         currentQuestionIndex++;
         showQuestion(currentQuestionIndex);
     }
 
     private void finishQuiz() {
-        int total = mListQuestions.size();
+        if (mListQuestions == null || mListQuestions.isEmpty()) {
+            // Nếu không có câu hỏi nào thì không cần hiện dialog và lưu điểm
+            finish();
+            return;
+        }
 
-        // Tính điểm trên thang 10
+        int total = mListQuestions.size();
         float finalScore = ((float) scoreCount / total) * 10;
         String scoreFormatted = String.format("%.1f", finalScore);
 
-        // --- LƯU ĐIỂM LÊN FIREBASE ---
         saveScoreToFirebase(finalScore, total, scoreCount);
 
-        // Hiển thị Dialog thông báo kết quả
         new AlertDialog.Builder(this)
                 .setTitle("Kết quả bài thi")
                 .setMessage("Số câu đúng: " + scoreCount + "/" + total + "\n\n" +
                         "ĐIỂM SỐ: " + scoreFormatted + "/10")
-                .setPositiveButton("Hoàn thành", (dialog, which) -> finish()) // Đóng Activity khi bấm OK
+                .setPositiveButton("Hoàn thành", (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
     }
 
-    // Hàm riêng để xử lý lưu vào Firestore
     private void saveScoreToFirebase(float finalScore, int total, int correct) {
         if (mAuth.getCurrentUser() == null) return;
 
         Map<String, Object> result = new HashMap<>();
         result.put("userId", mAuth.getCurrentUser().getUid());
-        result.put("topic", currentTopic);
-        // Lưu dạng số để sau này dễ sắp xếp (Query)
-        // Dùng parseFloat để làm tròn 1 chữ số thập phân cho đẹp
+        result.put("examId", examId);
+        result.put("examName", examName);
         result.put("score", Double.parseDouble(String.format("%.1f", finalScore).replace(",", ".")));
         result.put("totalQuestions", total);
         result.put("correctAnswers", correct);
@@ -179,9 +193,7 @@ public class DoQuizActivity extends AppCompatActivity {
 
         db.collection("quiz_results")
                 .add(result)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d("DoQuiz", "Lưu điểm thành công!");
-                })
+                .addOnSuccessListener(documentReference -> Log.d("DoQuiz", "Lưu điểm thành công!"))
                 .addOnFailureListener(e -> {
                     Log.e("DoQuiz", "Lỗi lưu điểm: " + e.getMessage());
                     Toast.makeText(DoQuizActivity.this, "Lỗi lưu điểm: " + e.getMessage(), Toast.LENGTH_SHORT).show();

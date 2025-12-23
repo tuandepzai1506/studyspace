@@ -11,10 +11,20 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/preview_question_index"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Câu 1:"
+            android:textStyle="bold"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/preview_question_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="1. Nội dung câu hỏi ở đây?"
+            android:layout_marginTop="8dp"
+            android:text="Nội dung câu hỏi ở đây?"
             android:textStyle="bold"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
@@ -24,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="A. Đáp án 1" />
+            android:text="Đáp án đúng: A. Đáp án 1" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

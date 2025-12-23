@@ -17,6 +17,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList; // Cần import ArrayList
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;      // Cần import List
+import java.util.Map;
+
 public class createClass extends AppCompatActivity {
 
     private Button buttonCreateClassMain;
@@ -51,12 +57,13 @@ public class createClass extends AppCompatActivity {
         dialog.show();
 
         EditText etClassName = popupView.findViewById(R.id.edittext_limit1);
-        EditText etMember  = popupView.findViewById(R.id.edittext_limit2);
+        EditText etMemberInput  = popupView.findViewById(R.id.edittext_limit2); // Đổi tên biến để tránh nhầm lẫn
         Button btnCreate     = popupView.findViewById(R.id.button_create_class);
 
         btnCreate.setOnClickListener(v -> {
             String className = etClassName.getText().toString().trim();
-            String member   = etMember.getText().toString().trim();
+            // Biến memberInput này là chuỗi (ví dụ mô tả lớp), không dùng cho danh sách thành viên
+            String memberInfo   = etMemberInput.getText().toString().trim();
 
             if (TextUtils.isEmpty(className)) {
                 etClassName.setError("Vui lòng nhập tên lớp");
@@ -64,39 +71,71 @@ public class createClass extends AppCompatActivity {
             }
 
             // Gọi hàm tạo lớp
-            createNewClassOnFirebase(className, member, dialog);
+            createNewClassOnFirebase(className, memberInfo, dialog);
         });
     }
 
     private void createNewClassOnFirebase(
             String className,
-            String member,
+            String memberInfo, // Biến này chỉ để log hoặc lưu mô tả (nếu cần)
             AlertDialog dialog) {
 
         FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
 
         String userId = user.getUid();
 
-        // Tạo ID cho lớp học
+        // 1. Tạo ID cho lớp học
         String classId = db.collection("classes").document().getId();
+
+        // 2. KHỞI TẠO DANH SÁCH THÀNH VIÊN (Quan trọng: Phải là List<String>)
+        List<String> initialMembers = new ArrayList<>();
+        initialMembers.add(userId); // Thêm giáo viên vào lớp đầu tiên
+
+        // 3. Tạo Object ClassModel
         ClassModel newClass = new ClassModel(
                 classId,
                 className,
-                member,
+                initialMembers, // Truyền List vào đây (Không truyền String memberInfo)
                 userId
         );
 
-        // Lưu lên Firestore
+        // 4. Lưu thông tin lớp học lên Firestore
         db.collection("classes")
                 .document(classId)
                 .set(newClass)
                 .addOnSuccessListener(unused -> {
-                    Toast.makeText(this, "Tạo lớp thành công!", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss(); // Đóng popup
+                    // Khi tạo lớp thành công, gọi hàm gửi tin nhắn chào mừng chứa ID lớp
+                    sendWelcomeMessage(classId, userId, dialog);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Lỗi tạo lớp: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("CreateClass", "Firestore error", e);
                 });
+    }
+
+    // Hàm riêng để gửi tin nhắn chào mừng
+    private void sendWelcomeMessage(String classId, String senderId, AlertDialog dialog) {
+        // Nội dung tin nhắn chứa ID lớp
+        String messageContent = "Mã lớp học: " + classId;
+
+        Map<String, Object> messageObj = new HashMap<>();
+        messageObj.put("senderId", senderId);
+        messageObj.put("message", messageContent);
+        messageObj.put("timestamp", new Date());
+
+        // Lưu vào: classes -> [classId] -> messages
+        db.collection("classes").document(classId).collection("messages")
+                .add(messageObj)
+                .addOnSuccessListener(documentReference -> {
+                    // Gửi tin nhắn xong mới báo thành công và đóng popup
+                    Toast.makeText(this, "Tạo lớp thành công & Đã gửi mã lớp!", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    // Nếu gửi tin nhắn lỗi thì vẫn báo tạo lớp xong
+                    Toast.makeText(this, "Tạo lớp xong nhưng lỗi gửi tin nhắn.", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }); // <-- Đã thêm dấu chấm phẩy ở đây
     }
 }

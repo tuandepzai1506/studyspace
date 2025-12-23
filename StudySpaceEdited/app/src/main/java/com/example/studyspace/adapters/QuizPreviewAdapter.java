@@ -55,6 +55,7 @@ public class QuizPreviewAdapter extends RecyclerView.Adapter<QuizPreviewAdapter.
 
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
+            tvIndex = itemView.findViewById(R.id.preview_question_index);
             tvContent = itemView.findViewById(R.id.preview_question_text);
             tvAnswer = itemView.findViewById(R.id.preview_answer);
         }

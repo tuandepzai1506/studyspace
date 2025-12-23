@@ -28,6 +28,19 @@
         android:textColor="#FFFFFF"
         android:textSize="12sp"
         android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnPreviewQuiz"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="#2196F3"
+        android:paddingHorizontal="16dp"
+        android:text="👁 Xem trước"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/textDateTime"
         android:layout_width="wrap_content"

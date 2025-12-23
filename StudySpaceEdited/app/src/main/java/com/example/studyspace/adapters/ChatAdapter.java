@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.studyspace.DoQuizActivity;
+import com.example.studyspace.QuizPreviewActivity;
 import com.example.studyspace.R;
 import com.example.studyspace.models.ChatMessage;
 
@@ -77,37 +78,54 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     // --- ViewHolder cho tin nhắn gửi ---
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textMessage, textDateTime;
-        private final android.widget.Button btnStartQuiz; // 1. Khai báo nút
+        private final android.widget.Button btnStartQuiz;
+        private final android.widget.Button btnPreviewQuiz;
 
         SentMessageViewHolder(View itemView) {
             super(itemView);
             textMessage = itemView.findViewById(R.id.textMessage);
             textDateTime = itemView.findViewById(R.id.textDateTime);
-            btnStartQuiz = itemView.findViewById(R.id.btnStartQuiz); // 2. Ánh xạ nút
+            btnStartQuiz = itemView.findViewById(R.id.btnStartQuiz);
+            btnPreviewQuiz = itemView.findViewById(R.id.btnPreviewQuiz);
         }
 
         void setData(ChatMessage chatMessage) {
             textMessage.setText(chatMessage.getMessage());
             textDateTime.setText(getReadableDateTime(chatMessage.getTimestamp()));
 
-            // 3. Logic hiển thị nút và bắt sự kiện click
-            if ("quiz".equals(chatMessage.getType())) {
+            if ("exam".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
+                btnPreviewQuiz.setVisibility(View.VISIBLE);
 
-                // Xử lý sự kiện bấm nút
                 btnStartQuiz.setOnClickListener(v -> {
                     android.content.Context context = v.getContext();
                     Intent intent = new Intent(context, DoQuizActivity.class);
+                    intent.putExtra("EXAM_ID", chatMessage.getExamId());
+                    intent.putExtra("EXAM_NAME", chatMessage.getMessage());
+                    context.startActivity(intent);
+                });
 
-                    // Truyền dữ liệu bộ đề sang
+                btnPreviewQuiz.setOnClickListener(v -> {
+                    android.content.Context context = v.getContext();
+                    Intent intent = new Intent(context, QuizPreviewActivity.class);
+                    intent.putExtra("EXAM_ID", chatMessage.getExamId());
+                    context.startActivity(intent);
+                });
+            } else if ("quiz".equals(chatMessage.getType())) {
+                btnStartQuiz.setVisibility(View.VISIBLE);
+                btnPreviewQuiz.setVisibility(View.GONE);
+
+                btnStartQuiz.setOnClickListener(v -> {
+                    android.content.Context context = v.getContext();
+                    Intent intent = new Intent(context, DoQuizActivity.class);
                     intent.putExtra("TOPIC", chatMessage.getTopic());
                     intent.putExtra("LEVEL", chatMessage.getLevel());
                     intent.putExtra("LIMIT", chatMessage.getLimit());
-
                     context.startActivity(intent);
                 });
             } else {
                 btnStartQuiz.setVisibility(View.GONE);
+                btnPreviewQuiz.setVisibility(View.GONE);
             }
         }
     }
@@ -115,35 +133,51 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     // --- ViewHolder cho tin nhắn nhận ---
     static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textMessage, textDateTime;
-        private final android.widget.Button btnStartQuiz; // Thêm nút này
+        private final android.widget.Button btnStartQuiz;
+        private final android.widget.Button btnPreviewQuiz;
 
         ReceivedMessageViewHolder(View itemView) {
             super(itemView);
             textMessage = itemView.findViewById(R.id.textMessage);
             textDateTime = itemView.findViewById(R.id.textDateTime);
-            // Nhớ thêm Button vào file XML trước nhé
             btnStartQuiz = itemView.findViewById(R.id.btnStartQuiz);
+            btnPreviewQuiz = itemView.findViewById(R.id.btnPreviewQuiz);
         }
 
         void setData(ChatMessage chatMessage) {
             textMessage.setText(chatMessage.getMessage());
             textDateTime.setText(getReadableDateTime(chatMessage.getTimestamp()));
 
-            // Kiểm tra xem có phải tin nhắn bộ đề không
-            if ("quiz".equals(chatMessage.getType())) {
+            if ("exam".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
+                btnPreviewQuiz.setVisibility(View.VISIBLE);
+                btnStartQuiz.setText("📝 Làm bài ngay");
+                btnPreviewQuiz.setText("👁 Xem trước");
+
+                btnStartQuiz.setOnClickListener(v -> {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, DoQuizActivity.class);
+                    intent.putExtra("EXAM_ID", chatMessage.getExamId());
+                    intent.putExtra("EXAM_NAME", chatMessage.getMessage());
+                    context.startActivity(intent);
+                });
+
+                btnPreviewQuiz.setOnClickListener(v -> {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, QuizPreviewActivity.class);
+                    intent.putExtra("EXAM_ID", chatMessage.getExamId());
+                    context.startActivity(intent);
+                });
+            } else if ("quiz".equals(chatMessage.getType())) {
+                btnStartQuiz.setVisibility(View.VISIBLE);
+                btnPreviewQuiz.setVisibility(View.GONE);
                 btnStartQuiz.setText("📝 Làm bài ngay");
 
                 btnStartQuiz.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Lấy context từ chính cái nút (v) vừa bấm
                         Context context = v.getContext();
-
-                        // Chuyển sang màn hình làm bài
                         Intent intent = new Intent(context, DoQuizActivity.class);
-
-                        // Truyền dữ liệu
                         intent.putExtra("TOPIC", chatMessage.getTopic());
                         intent.putExtra("LEVEL", chatMessage.getLevel());
                         intent.putExtra("LIMIT", chatMessage.getLimit());
@@ -154,6 +188,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
             } else {
                 btnStartQuiz.setVisibility(View.GONE);
+                btnPreviewQuiz.setVisibility(View.GONE);
             }
         }
     }

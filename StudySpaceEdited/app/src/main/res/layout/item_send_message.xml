@@ -24,10 +24,23 @@
         android:layout_marginTop="4dp"
         android:backgroundTint="#FFFFFF"
         android:paddingHorizontal="16dp"
-        android:text="📝 Làm thử / Xem trước"
+        android:text="📝 Làm bài"
         android:textColor="#0084FF"
         android:textSize="12sp"
         android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnPreviewQuiz"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:backgroundTint="#FFFFFF"
+        android:paddingHorizontal="16dp"
+        android:text="👁 Xem trước"
+        android:textColor="#0084FF"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/textDateTime"
         android:layout_width="wrap_content"

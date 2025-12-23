@@ -109,7 +109,7 @@ public class showClass extends AppCompatActivity {
                             ClassModel classModel = doc.toObject(ClassModel.class);
 
                             // Đảm bảo lấy đúng ID của document gán vào model (nếu cần)
-                            // classModel.setClassId(doc.getId());
+                            classModel.setClassId(doc.getId());
 
                             mListClass.add(classModel);
                         }

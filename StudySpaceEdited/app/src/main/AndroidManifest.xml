@@ -57,6 +57,8 @@
             android:exported="false"/>
         <activity android:name=".StudentActivity"
             android:exported="false"/>
+        <activity android:name=".StudentClassListActivity"
+            android:exported="false"/>
 
     </application>
 

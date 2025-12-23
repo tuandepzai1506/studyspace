@@ -6,40 +6,53 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.studyspace.models.Question;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class QuestionViewModel extends ViewModel {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final CollectionReference questionsRef = db.collection("questions");
+    private final CollectionReference examsRef = db.collection("Exam"); // Tham chiếu đến collection Exam
 
-    // LiveData để chứa danh sách câu hỏi (dùng cho Ngân hàng câu hỏi)
     private final MutableLiveData<List<Question>> questionsLiveData = new MutableLiveData<>();
-
-    // Biến quản lý việc lắng nghe Firestore
     private ListenerRegistration listenerRegistration;
 
-    // =================================================================================
-    // PHẦN 1: QUẢN LÝ NGÂN HÀNG CÂU HỎI (REALTIME)
-    // =================================================================================
-
-    // Getter cho LiveData
     public LiveData<List<Question>> getQuestionsLiveData() {
         return questionsLiveData;
     }
+    // Lấy câu hỏi cho một bài thi cụ thể
+    public Task<List<Question>> getQuestionsForExam(String examId) {
+        return examsRef.document(examId).collection("questions").get().continueWith(task -> {
+            if (!task.isSuccessful()) {
+                throw task.getException();
+            }
+            List<Question> list = new ArrayList<>();
+            if (task.getResult() != null) {
+                for (QueryDocumentSnapshot doc : task.getResult()) {
+                    Question q = doc.toObject(Question.class);
+                    q.setId(doc.getId()); // Lưu ID của câu hỏi
+                    list.add(q);
+                }
+            }
+            return list;
+        });
+    }
 
-    // Bắt đầu lắng nghe thay đổi từ Firestore
+
     public void startListening() {
-        if (listenerRegistration != null) return; // Đang lắng nghe rồi thì thôi
+        if (listenerRegistration != null) return;
 
-        // Lấy dữ liệu, sắp xếp theo topic
         listenerRegistration = questionsRef.orderBy("topic", Query.Direction.ASCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -50,7 +63,7 @@ public class QuestionViewModel extends ViewModel {
                     if (value != null) {
                         for (QueryDocumentSnapshot doc : value) {
                             Question question = doc.toObject(Question.class);
-                            question.setId(doc.getId()); // Lưu ID để xóa/sửa
+                            question.setId(doc.getId());
                             questionList.add(question);
                         }
                     }
@@ -58,7 +71,6 @@ public class QuestionViewModel extends ViewModel {
                 });
     }
 
-    // Dừng lắng nghe
     public void stopListening() {
         if (listenerRegistration != null) {
             listenerRegistration.remove();
@@ -66,44 +78,41 @@ public class QuestionViewModel extends ViewModel {
         }
     }
 
-    // =================================================================================
-    // PHẦN 2: TẠO ĐỀ THI / XEM TRƯỚC (LỌC DỮ LIỆU) - MỚI THÊM
-    // =================================================================================
+    public Task<List<Question>> getQuizQuestionsByDifficulty(String topic, int minLevel, int maxLevel, int limit) {
+        if (limit == 0) {
+            return Tasks.forResult(new ArrayList<>());
+        }
 
-    /**
-     * Hàm lấy danh sách câu hỏi theo tiêu chí để tạo đề thi
-     * Lưu ý: Cần tạo Index trên Firestore nếu log báo lỗi
-     */
-    public LiveData<List<Question>> getQuizQuestions(String topic, int level, int limit) {
-        MutableLiveData<List<Question>> quizQuestions = new MutableLiveData<>();
-
-        // Truy vấn: Lọc Topic + Level + Giới hạn số lượng
-        questionsRef.whereEqualTo("topic", topic)
-                .whereEqualTo("level", level)
-                .limit(limit)
-                .get() // Dùng get() lấy 1 lần, không cần realtime
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Question> list = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        Question q = doc.toObject(Question.class);
-                        q.setId(doc.getId());
-                        list.add(q);
+        // Fetch all questions by topic first, then filter by level in code to avoid index requirement
+        return questionsRef.whereEqualTo("topic", topic).get().continueWith(task -> {
+            if (!task.isSuccessful()) {
+                throw task.getException();
+            }
+            
+            List<Question> filteredList = new ArrayList<>();
+            if (task.getResult() != null) {
+                for (QueryDocumentSnapshot doc : task.getResult()) {
+                    Question q = doc.toObject(Question.class);
+                    q.setId(doc.getId());
+                    
+                    // Filter by level range in code
+                    if (q.getLevel() >= minLevel && q.getLevel() <= maxLevel) {
+                        filteredList.add(q);
                     }
-                    quizQuestions.setValue(list);
-                })
-                .addOnFailureListener(e -> {
-                    // Nếu lỗi thì trả về list rỗng để app không bị crash
-                    quizQuestions.setValue(new ArrayList<>());
-                });
-
-        return quizQuestions;
+                }
+            }
+            
+            // Shuffle and limit the results
+            if (filteredList.size() > limit) {
+                Collections.shuffle(filteredList);
+                return filteredList.subList(0, limit);
+            } else {
+                Collections.shuffle(filteredList);
+                return filteredList;
+            }
+        });
     }
 
-    // =================================================================================
-    // PHẦN 3: THÊM / XÓA / SỬA
-    // =================================================================================
-
-    // Thêm câu hỏi
     public void addQuestion(Question question, OnSaveCompleteListener listener) {
         questionsRef.add(question)
                 .addOnSuccessListener(documentReference -> {
@@ -114,12 +123,10 @@ public class QuestionViewModel extends ViewModel {
                 });
     }
 
-    // Xóa câu hỏi
     public Task<Void> deleteQuestion(String questionId) {
         return questionsRef.document(questionId).delete();
     }
 
-    // Interface callback
     public interface OnSaveCompleteListener {
         void onSaveSuccess();
         void onSaveFailure(Exception e);

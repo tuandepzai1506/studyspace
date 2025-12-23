@@ -17,6 +17,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Đặt tên cho bộ đề" />
+
+    <EditText
+        android:id="@+id/edittext_popup_quiz_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Ví dụ: Đề kiểm tra 15 phút" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Chọn chủ đề" />
 
     <Spinner
@@ -28,35 +40,39 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chọn độ khó" />
-
-    <Spinner
-        android:id="@+id/spinner_popup_level"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="16dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nhập số lượng câu hỏi" />
+        android:text="Số lượng câu hỏi dễ (Mức 1)" />
 
     <EditText
-        android:id="@+id/edittext_popup_limit"
+        android:id="@+id/edittext_easy_questions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number"
-        android:hint="Ví dụ: 10" />
+        android:hint="Nhập số lượng câu hỏi dễ" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Đặt tên cho bộ đề" />
+        android:text="Số lượng câu hỏi trung bình (Mức 2, 3)" />
 
     <EditText
-        android:id="@+id/edittext_popup_quiz_name"
+        android:id="@+id/edittext_medium_questions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ví dụ: Đề kiểm tra 15 phút" />
+        android:inputType="number"
+        android:hint="Nhập số lượng câu hỏi trung bình" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Số lượng câu hỏi khó (Mức 4, 5)" />
+
+    <EditText
+        android:id="@+id/edittext_hard_questions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Nhập số lượng câu hỏi khó" />
+
 </LinearLayout>

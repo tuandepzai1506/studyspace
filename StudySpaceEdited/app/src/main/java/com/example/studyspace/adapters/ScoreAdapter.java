@@ -32,7 +32,11 @@ public class ScoreAdapter extends RecyclerView.Adapter<ScoreAdapter.ScoreViewHol
         ScoreResult result = listScore.get(position);
         if (result == null) return;
 
-        holder.tvTopic.setText("Chủ đề: " + result.getTopic());
+        // Hiển thị tên bộ đề hoặc topic
+        String examName = result.getExamName() != null && !result.getExamName().isEmpty() 
+                ? result.getExamName() 
+                : (result.getTopic() != null ? result.getTopic() : "Không xác định");
+        holder.tvTopic.setText("Bộ đề: " + examName);
         holder.tvScore.setText(String.valueOf(result.getScore()));
 
         // Format ngày tháng
