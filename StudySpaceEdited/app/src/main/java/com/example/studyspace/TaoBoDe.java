@@ -248,6 +248,7 @@ public class TaoBoDe extends AppCompatActivity {
                 0, // Not applicable
                 0  // Not applicable
         );
+        chatMessage.setClassId(classId); // Set classId
 
         db.collection("classes").document(classId).collection("messages")
                 .add(chatMessage)

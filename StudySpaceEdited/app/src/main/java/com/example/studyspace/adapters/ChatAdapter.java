@@ -23,14 +23,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<ChatMessage> chatMessages;
     private final String senderId; // ID của người dùng hiện tại (để so sánh)
+    private String classId; // ID của lớp học
 
     // Định nghĩa 2 loại tin nhắn
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(List<ChatMessage> chatMessages, String senderId) {
+    public ChatAdapter(List<ChatMessage> chatMessages, String senderId, String classId) {
         this.chatMessages = chatMessages;
         this.senderId = senderId;
+        this.classId = classId;
     }
 
     // Hàm quan trọng nhất: Quyết định xem tin nhắn này là GỬI hay NHẬN
@@ -50,12 +52,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             // Nếu là tin nhắn gửi -> Dùng layout item_sent_message
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_send_message, parent, false);
-            return new SentMessageViewHolder(view);
+            return new SentMessageViewHolder(view, classId);
         } else {
             // Nếu là tin nhắn nhận -> Dùng layout item_received_message
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_received_message, parent, false);
-            return new ReceivedMessageViewHolder(view);
+            return new ReceivedMessageViewHolder(view, classId);
         }
     }
 
@@ -80,9 +82,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private final TextView textMessage, textDateTime;
         private final android.widget.Button btnStartQuiz;
         private final android.widget.Button btnPreviewQuiz;
+        private final String classId;
 
-        SentMessageViewHolder(View itemView) {
+        SentMessageViewHolder(View itemView, String classId) {
             super(itemView);
+            this.classId = classId;
             textMessage = itemView.findViewById(R.id.textMessage);
             textDateTime = itemView.findViewById(R.id.textDateTime);
             btnStartQuiz = itemView.findViewById(R.id.btnStartQuiz);
@@ -102,6 +106,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     Intent intent = new Intent(context, DoQuizActivity.class);
                     intent.putExtra("EXAM_ID", chatMessage.getExamId());
                     intent.putExtra("EXAM_NAME", chatMessage.getMessage());
+                    intent.putExtra("CLASS_ID", classId);
                     context.startActivity(intent);
                 });
 
@@ -135,9 +140,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private final TextView textMessage, textDateTime;
         private final android.widget.Button btnStartQuiz;
         private final android.widget.Button btnPreviewQuiz;
+        private final String classId;
 
-        ReceivedMessageViewHolder(View itemView) {
+        ReceivedMessageViewHolder(View itemView, String classId) {
             super(itemView);
+            this.classId = classId;
             textMessage = itemView.findViewById(R.id.textMessage);
             textDateTime = itemView.findViewById(R.id.textDateTime);
             btnStartQuiz = itemView.findViewById(R.id.btnStartQuiz);
@@ -159,6 +166,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     Intent intent = new Intent(context, DoQuizActivity.class);
                     intent.putExtra("EXAM_ID", chatMessage.getExamId());
                     intent.putExtra("EXAM_NAME", chatMessage.getMessage());
+                    intent.putExtra("CLASS_ID", classId);
                     context.startActivity(intent);
                 });
 

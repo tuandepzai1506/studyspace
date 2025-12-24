@@ -13,6 +13,7 @@ public class ChatMessage {
     private int level;
     private int limit;
     private String examId; // ID của bộ đề (cho type="exam")
+    private String classId; // ID của lớp học
 
     public ChatMessage() { }
 
@@ -42,6 +43,9 @@ public class ChatMessage {
 
     public String getExamId() { return examId; }
     public void setExamId(String examId) { this.examId = examId; }
+
+    public String getClassId() { return classId; }
+    public void setClassId(String classId) { this.classId = classId; }
 
     public String getSenderId() { return senderId; }
     public void setSenderId(String senderId) { this.senderId = senderId; }

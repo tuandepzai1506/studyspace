@@ -104,7 +104,7 @@ public class classroom extends AppCompatActivity {
     private void setupRecyclerView() {
         chatMessages = new ArrayList<>();
         // Bạn cần tạo ChatAdapter.java để dòng này hoạt động
-        chatAdapter = new ChatAdapter(chatMessages, mAuth.getCurrentUser().getUid());
+        chatAdapter = new ChatAdapter(chatMessages, mAuth.getCurrentUser().getUid(), classId);
 
         chatRecyclerView.setAdapter(chatAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

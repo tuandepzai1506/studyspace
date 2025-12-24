@@ -40,6 +40,7 @@ public class DoQuizActivity extends AppCompatActivity {
     // Biến lưu trữ thông tin để gửi lên Firebase
     private String examId;
     private String examName;
+    private String classId;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -56,6 +57,7 @@ public class DoQuizActivity extends AppCompatActivity {
         // Nhận dữ liệu từ Intent
         examId = getIntent().getStringExtra("EXAM_ID");
         examName = getIntent().getStringExtra("EXAM_NAME");
+        classId = getIntent().getStringExtra("CLASS_ID");
 
         // Fallback: Nếu không có EXAM_NAME, tạo từ EXAM_ID
         if (examName == null || examName.isEmpty()) {
@@ -186,6 +188,8 @@ public class DoQuizActivity extends AppCompatActivity {
         result.put("userId", mAuth.getCurrentUser().getUid());
         result.put("examId", examId);
         result.put("examName", examName);
+        result.put("classId", classId != null ? classId : "");
+        result.put("examClassKey", (classId != null ? classId : "") + "_" + examId); // Unique key for safety
         result.put("score", Double.parseDouble(String.format("%.1f", finalScore).replace(",", ".")));
         result.put("totalQuestions", total);
         result.put("correctAnswers", correct);

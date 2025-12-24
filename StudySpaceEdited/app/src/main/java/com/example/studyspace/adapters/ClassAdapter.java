@@ -47,7 +47,8 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
         if (classModel == null) return;
 
         holder.tvClassName.setText(classModel.getClassName());
-        holder.tvMember.setText("So luong sinh vien: " + classModel.getMember());
+        int memberCount = classModel.getMember() != null ? classModel.getMember().size() : 0;
+        holder.tvMember.setText("Thành viên: " + memberCount);
 
         // 4. Bắt sự kiện click vào item
         holder.itemView.setOnClickListener(new View.OnClickListener() {

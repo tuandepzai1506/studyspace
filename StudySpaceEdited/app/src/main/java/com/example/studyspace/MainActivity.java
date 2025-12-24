@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         CardView bangDiem = findViewById(R.id.bangDiem);
         if (bangDiem != null){
             bangDiem.setOnClickListener(v ->{
-                runAnimationAndSwitchActivity(v, scoreTable.class);
+                runAnimationAndSwitchActivity(v, ClassScoresActivity.class);
             });
         }
         Button btn_logout = findViewById(R.id.btn_logout);

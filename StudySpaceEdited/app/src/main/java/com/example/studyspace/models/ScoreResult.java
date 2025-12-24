@@ -10,6 +10,8 @@ public class ScoreResult {
     private String examId; // ID bộ đề
     private int totalQuestions;
     private int correctAnswers;
+    private String userId; // ID học sinh
+    private String studentName; // Tên học sinh
 
     public ScoreResult() { } // Bắt buộc cho Firebase
 
@@ -34,4 +36,10 @@ public class ScoreResult {
     
     public int getCorrectAnswers() { return correctAnswers; }
     public void setCorrectAnswers(int correctAnswers) { this.correctAnswers = correctAnswers; }
+    
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+    
+    public String getStudentName() { return studentName; }
+    public void setStudentName(String studentName) { this.studentName = studentName; }
 }
