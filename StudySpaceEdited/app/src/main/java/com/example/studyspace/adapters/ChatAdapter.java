@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.studyspace.DoQuizActivity;
-import com.example.studyspace.QuizPreviewActivity;
 import com.example.studyspace.R;
 import com.example.studyspace.models.ChatMessage;
 
@@ -81,7 +80,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textMessage, textDateTime;
         private final android.widget.Button btnStartQuiz;
-        private final android.widget.Button btnPreviewQuiz;
         private final String classId;
 
         SentMessageViewHolder(View itemView, String classId) {
@@ -90,7 +88,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             textMessage = itemView.findViewById(R.id.textMessage);
             textDateTime = itemView.findViewById(R.id.textDateTime);
             btnStartQuiz = itemView.findViewById(R.id.btnStartQuiz);
-            btnPreviewQuiz = itemView.findViewById(R.id.btnPreviewQuiz);
         }
 
         void setData(ChatMessage chatMessage) {
@@ -99,7 +96,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             if ("exam".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
-                btnPreviewQuiz.setVisibility(View.VISIBLE);
 
                 btnStartQuiz.setOnClickListener(v -> {
                     android.content.Context context = v.getContext();
@@ -109,16 +105,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     intent.putExtra("CLASS_ID", classId);
                     context.startActivity(intent);
                 });
-
-                btnPreviewQuiz.setOnClickListener(v -> {
-                    android.content.Context context = v.getContext();
-                    Intent intent = new Intent(context, QuizPreviewActivity.class);
-                    intent.putExtra("EXAM_ID", chatMessage.getExamId());
-                    context.startActivity(intent);
-                });
             } else if ("quiz".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
-                btnPreviewQuiz.setVisibility(View.GONE);
 
                 btnStartQuiz.setOnClickListener(v -> {
                     android.content.Context context = v.getContext();
@@ -130,7 +118,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
             } else {
                 btnStartQuiz.setVisibility(View.GONE);
-                btnPreviewQuiz.setVisibility(View.GONE);
             }
         }
     }
@@ -139,7 +126,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textMessage, textDateTime;
         private final android.widget.Button btnStartQuiz;
-        private final android.widget.Button btnPreviewQuiz;
         private final String classId;
 
         ReceivedMessageViewHolder(View itemView, String classId) {
@@ -148,7 +134,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             textMessage = itemView.findViewById(R.id.textMessage);
             textDateTime = itemView.findViewById(R.id.textDateTime);
             btnStartQuiz = itemView.findViewById(R.id.btnStartQuiz);
-            btnPreviewQuiz = itemView.findViewById(R.id.btnPreviewQuiz);
         }
 
         void setData(ChatMessage chatMessage) {
@@ -157,9 +142,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             if ("exam".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
-                btnPreviewQuiz.setVisibility(View.VISIBLE);
                 btnStartQuiz.setText("📝 Làm bài ngay");
-                btnPreviewQuiz.setText("👁 Xem trước");
 
                 btnStartQuiz.setOnClickListener(v -> {
                     Context context = v.getContext();
@@ -169,16 +152,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     intent.putExtra("CLASS_ID", classId);
                     context.startActivity(intent);
                 });
-
-                btnPreviewQuiz.setOnClickListener(v -> {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, QuizPreviewActivity.class);
-                    intent.putExtra("EXAM_ID", chatMessage.getExamId());
-                    context.startActivity(intent);
-                });
             } else if ("quiz".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
-                btnPreviewQuiz.setVisibility(View.GONE);
                 btnStartQuiz.setText("📝 Làm bài ngay");
 
                 btnStartQuiz.setOnClickListener(new View.OnClickListener() {
@@ -196,7 +171,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
             } else {
                 btnStartQuiz.setVisibility(View.GONE);
-                btnPreviewQuiz.setVisibility(View.GONE);
             }
         }
     }

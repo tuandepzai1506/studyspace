@@ -6,40 +6,44 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/textMessage"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#0084FF"
-        android:maxWidth="280dp"
-        android:padding="12dp"
-        android:text="Nội dung tin nhắn"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        android:layout_gravity="end"
+        app:cardCornerRadius="16dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Button
-        android:id="@+id/btnStartQuiz"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="#FFFFFF"
-        android:paddingHorizontal="16dp"
-        android:text="📝 Làm bài"
-        android:textColor="#0084FF"
-        android:textSize="12sp"
-        android:visibility="gone" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnPreviewQuiz"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginTop="4dp"
-        android:backgroundTint="#FFFFFF"
-        android:paddingHorizontal="16dp"
-        android:text="👁 Xem trước"
-        android:textColor="#0084FF"
-        android:textSize="12sp"
-        android:visibility="gone" />
+            <TextView
+                android:id="@+id/textMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#0084FF"
+                android:maxWidth="280dp"
+                android:padding="12dp"
+                android:text="Nội dung tin nhắn"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnStartQuiz"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginHorizontal="8dp"
+                android:backgroundTint="#FFFFFF"
+                android:paddingHorizontal="16dp"
+                android:text="📝 Làm bài"
+                android:textColor="#0084FF"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/textDateTime"
