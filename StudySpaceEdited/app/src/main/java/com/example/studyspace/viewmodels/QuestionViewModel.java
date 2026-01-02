@@ -27,7 +27,10 @@ public class QuestionViewModel extends ViewModel {
 
     private final MutableLiveData<List<Question>> questionsLiveData = new MutableLiveData<>();
     private ListenerRegistration listenerRegistration;
-
+    public Task<Void> deleteQuestion(String questionId) {
+        // Hàm này sử dụng questionsRef đã khai báo ở đầu class của bạn
+        return questionsRef.document(questionId).delete();
+    }
     public LiveData<List<Question>> getQuestionsLiveData() {
         return questionsLiveData;
     }
@@ -114,17 +117,21 @@ public class QuestionViewModel extends ViewModel {
     }
 
     public void addQuestion(Question question, OnSaveCompleteListener listener) {
-        questionsRef.add(question)
-                .addOnSuccessListener(documentReference -> {
+        // 1. Tạo một Document Reference mới để lấy ID ngẫu nhiên trước
+        com.google.firebase.firestore.DocumentReference newDocRef = questionsRef.document();
+
+        // 2. Lấy ID đó gán vào thuộc tính id của đối tượng Question
+        String autoId = newDocRef.getId();
+        question.setId(autoId);
+
+        // 3. Sử dụng .set() thay vì .add() để lưu dữ liệu kèm ID
+        newDocRef.set(question)
+                .addOnSuccessListener(aVoid -> {
                     if (listener != null) listener.onSaveSuccess();
                 })
                 .addOnFailureListener(e -> {
                     if (listener != null) listener.onSaveFailure(e);
                 });
-    }
-
-    public Task<Void> deleteQuestion(String questionId) {
-        return questionsRef.document(questionId).delete();
     }
 
     public interface OnSaveCompleteListener {

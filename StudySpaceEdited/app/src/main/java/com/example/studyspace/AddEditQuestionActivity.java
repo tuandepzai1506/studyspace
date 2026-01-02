@@ -28,7 +28,7 @@ public class AddEditQuestionActivity extends AppCompatActivity {
     private TextInputEditText etQuestionText, etOption1, etOption2, etOption3, etOption4, etTopic;
     private Spinner spinnerLevel;
     private Button btnSave;
-
+    private String existingQuestionId = null; // null là thêm mới, có giá trị là sửa
     // MỚI: Khai báo biến RadioGroup để chọn đáp án đúng
     private RadioGroup rgCorrectAnswer;
 
@@ -53,7 +53,10 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         rgCorrectAnswer = findViewById(R.id.rg_correct_answer);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar_add_edit);
-
+        if (getIntent().hasExtra("EXTRA_QUESTION_ID")) {
+            existingQuestionId = getIntent().getStringExtra("EXTRA_QUESTION_ID");
+            loadQuestionData(existingQuestionId); // Gọi hàm load
+        }
         // Thiết lập Spinner cho độ khó
         setupLevelSpinner();
 
@@ -63,7 +66,6 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         // Xử lý nút Lưu
         btnSave.setOnClickListener(v -> saveQuestion());
     }
-
     private void setupLevelSpinner() {
         // Tạo dữ liệu cho Spinner (Độ khó 1-5)
         Integer[] levels = new Integer[]{1, 2, 3, 4, 5};
@@ -134,5 +136,72 @@ public class AddEditQuestionActivity extends AppCompatActivity {
                 Toast.makeText(AddEditQuestionActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+        Question question = new Question(questionText, options, correctIndex, topic, level);
+
+        if (existingQuestionId != null) {
+            // CHẾ ĐỘ SỬA: Gán lại ID cũ và gọi hàm update
+            question.setId(existingQuestionId);
+            updateQuestion(question);
+        } else {
+            // CHẾ ĐỘ THÊM: Gọi hàm add như cũ
+            questionViewModel.addQuestion(question, new QuestionViewModel.OnSaveCompleteListener() {
+                @Override
+                public void onSaveSuccess() {
+                    Toast.makeText(AddEditQuestionActivity.this, "Thêm thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                }
+                @Override
+                public void onSaveFailure(Exception e) {
+                    Toast.makeText(AddEditQuestionActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+    private void loadQuestionData(String id) {
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("questions").document(id).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Question q = documentSnapshot.toObject(Question.class);
+                    if (q != null) {
+                        etQuestionText.setText(q.getQuestionText());
+                        etTopic.setText(q.getTopic());
+
+                        List<String> opts = q.getOptions();
+                        if (opts != null && opts.size() >= 2) {
+                            etOption1.setText(opts.get(0));
+                            etOption2.setText(opts.get(1));
+                            if (opts.size() > 2) etOption3.setText(opts.get(2));
+                            if (opts.size() > 3) etOption4.setText(opts.get(3));
+                        }
+
+                        // Set đáp án đúng
+                        int correctIndex = q.getCorrectAnswerIndex();
+                        if (correctIndex == 0) rgCorrectAnswer.check(R.id.rb_option_a);
+                        else if (correctIndex == 1) rgCorrectAnswer.check(R.id.rb_option_b);
+                        else if (correctIndex == 2) rgCorrectAnswer.check(R.id.rb_option_c);
+                        else if (correctIndex == 3) rgCorrectAnswer.check(R.id.rb_option_d);
+
+                        // Set độ khó
+                        spinnerLevel.setSelection(q.getLevel() - 1);
+                    }
+                });
+    }
+    private void updateQuestion(Question question) {
+        // 1. Tham chiếu đến đúng Document ID đang cần sửa
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("questions")
+                .document(existingQuestionId) // Dùng ID đã nhận được từ Intent
+                .set(question) // .set() sẽ ghi đè toàn bộ dữ liệu mới lên ID cũ này
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Cập nhật thành công ID: " + existingQuestionId);
+                    Toast.makeText(this, "Cập nhật câu hỏi thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK); // Thông báo cho màn hình danh sách biết để load lại dữ liệu
+                    finish(); // Đóng màn hình
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Lỗi cập nhật: ", e);
+                    Toast.makeText(this, "Lỗi khi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }

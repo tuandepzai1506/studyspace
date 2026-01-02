@@ -13,7 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.android.gms.tasks.Task;
 import com.example.studyspace.adapters.QuestionAdapter;
 import com.example.studyspace.models.Question;
 import com.example.studyspace.viewmodels.QuestionViewModel;
@@ -82,9 +82,7 @@ public class Question_Bank extends AppCompatActivity {
                 intent.putExtra("EXTRA_QUESTION_ID", question.getId()); // Gửi ID sang để bên kia biết là Sửa
                 // Bạn cần sửa thêm AddEditQuestionActivity để nhận ID này và hiển thị dữ liệu cũ
 
-                // Tạm thời hiển thị Toast
-                Toast.makeText(Question_Bank.this, "Chức năng sửa đang hoàn thiện", Toast.LENGTH_SHORT).show();
-                // addOrEditQuestionLauncher.launch(intent); // Bỏ comment khi đã code xong phần sửa
+                addOrEditQuestionLauncher.launch(intent); // Bỏ comment khi đã code xong phần sửa
             }
 
             @Override
@@ -115,9 +113,20 @@ public class Question_Bank extends AppCompatActivity {
 
     // Gọi ViewModel để xóa
     private void deleteQuestion(Question question) {
+        // Kiểm tra an toàn ID
+        if (question.getId() == null) {
+            Toast.makeText(this, "ID không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Gọi hàm và xử lý kết quả
         questionViewModel.deleteQuestion(question.getId())
-                .addOnSuccessListener(aVoid -> Toast.makeText(Question_Bank.this, "Đã xóa câu hỏi", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(Question_Bank.this, "Lỗi khi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(Question_Bank.this, "Đã xóa câu hỏi", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener((Exception e) -> { // Thêm kiểu Exception ở đây
+                    Toast.makeText(Question_Bank.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
