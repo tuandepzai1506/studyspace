@@ -81,78 +81,61 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         String option3 = etOption3.getText().toString().trim();
         String option4 = etOption4.getText().toString().trim();
         String topic = etTopic.getText().toString().trim();
+
+        // Kiểm tra Spinner tránh lỗi NullPointer
+        if (spinnerLevel.getSelectedItem() == null) return;
         int level = (Integer) spinnerLevel.getSelectedItem();
 
-        Log.d(TAG, "== BẮT ĐẦU LƯU ==");
-
-        // 1. Kiểm tra dữ liệu đầu vào cơ bản
-        if (TextUtils.isEmpty(questionText) || TextUtils.isEmpty(option1) || TextUtils.isEmpty(option2) || TextUtils.isEmpty(topic)) {
+        // 1. Kiểm tra dữ liệu đầu vào
+        if (TextUtils.isEmpty(questionText) || TextUtils.isEmpty(option1) ||
+                TextUtils.isEmpty(option2) || TextUtils.isEmpty(topic)) {
             Toast.makeText(this, "Vui lòng nhập đủ: Câu hỏi, Đáp án A, B và Chủ đề", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // 2. Tạo danh sách đáp án
         List<String> options = new ArrayList<>();
-        options.add(option1); // Index 0
-        options.add(option2); // Index 1
-        if (!option3.isEmpty()) options.add(option3); // Index 2 (nếu có)
-        if (!option4.isEmpty()) options.add(option4); // Index 3 (nếu có)
+        options.add(option1);
+        options.add(option2);
+        if (!option3.isEmpty()) options.add(option3);
+        if (!option4.isEmpty()) options.add(option4);
 
-        // 3. XÁC ĐỊNH ĐÁP ÁN ĐÚNG (Dựa vào RadioGroup)
-        int correctIndex = 0; // Mặc định là A (0)
+        // 3. Xác định đáp án đúng
+        int correctIndex = 0;
         int checkedId = rgCorrectAnswer.getCheckedRadioButtonId();
+        if (checkedId == R.id.rb_option_b) correctIndex = 1;
+        else if (checkedId == R.id.rb_option_c) correctIndex = 2;
+        else if (checkedId == R.id.rb_option_d) correctIndex = 3;
 
-        if (checkedId == R.id.rb_option_b) {
-            correctIndex = 1;
-        } else if (checkedId == R.id.rb_option_c) {
-            correctIndex = 2;
-        } else if (checkedId == R.id.rb_option_d) {
-            correctIndex = 3;
-        }
-
-        // 4. KIỂM TRA LOGIC QUAN TRỌNG:
-        // Nếu chọn đáp án đúng là C (index 2) mà danh sách chỉ có 2 phần tử (A, B) -> Lỗi
         if (correctIndex >= options.size()) {
-            Toast.makeText(this, "Đáp án đúng bạn chọn (" + (correctIndex == 2 ? "C" : "D") + ") chưa có nội dung!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đáp án đúng chưa có nội dung!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 5. Tạo đối tượng Question (Truyền correctIndex vào thay vì số 0)
-        Question newQuestion = new Question(questionText, options, correctIndex, topic, level);
+        // 4. Khóa nút lưu để tránh nhấn nhiều lần
+        btnSave.setEnabled(false);
 
-        // 6. Gọi ViewModel để lưu
-        Log.d(TAG, "Đang gọi questionViewModel.addQuestion...");
-        questionViewModel.addQuestion(newQuestion, new QuestionViewModel.OnSaveCompleteListener() {
-            @Override
-            public void onSaveSuccess() {
-                Log.d(TAG, "LƯU THÀNH CÔNG.");
-                Toast.makeText(AddEditQuestionActivity.this, "Thêm câu hỏi thành công!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-
-            @Override
-            public void onSaveFailure(Exception e) {
-                Log.e(TAG, "LƯU THẤT BẠI.", e);
-                Toast.makeText(AddEditQuestionActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        // 5. Tạo đối tượng Question
         Question question = new Question(questionText, options, correctIndex, topic, level);
 
+        // 6. LUỒNG LOGIC CHÍNH: Phân biệt Thêm và Sửa
         if (existingQuestionId != null) {
-            // CHẾ ĐỘ SỬA: Gán lại ID cũ và gọi hàm update
+            // CHẾ ĐỘ SỬA
             question.setId(existingQuestionId);
             updateQuestion(question);
         } else {
-            // CHẾ ĐỘ THÊM: Gọi hàm add như cũ
+            // CHẾ ĐỘ THÊM MỚI (Chỉ gọi 1 lần duy nhất ở đây)
             questionViewModel.addQuestion(question, new QuestionViewModel.OnSaveCompleteListener() {
                 @Override
                 public void onSaveSuccess() {
-                    Toast.makeText(AddEditQuestionActivity.this, "Thêm thành công!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddEditQuestionActivity.this, "Thêm câu hỏi thành công!", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
                 }
+
                 @Override
                 public void onSaveFailure(Exception e) {
+                    btnSave.setEnabled(true); // Mở lại nút nếu lỗi
                     Toast.makeText(AddEditQuestionActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });

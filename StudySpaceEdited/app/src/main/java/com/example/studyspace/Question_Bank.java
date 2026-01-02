@@ -25,7 +25,9 @@ public class Question_Bank extends AppCompatActivity {
 
     private QuestionViewModel questionViewModel;
     private QuestionAdapter adapter;
-
+    private com.google.android.material.textfield.TextInputEditText etFilterTopic;
+    private android.widget.Spinner spinnerFilterLevel;
+    private android.widget.ImageButton btnApplyFilter;
     // Launcher để hứng kết quả khi thêm/sửa câu hỏi xong
     private final ActivityResultLauncher<Intent> addOrEditQuestionLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -96,6 +98,34 @@ public class Question_Bank extends AppCompatActivity {
         fabAdd.setOnClickListener(view -> {
             Intent intent = new Intent(Question_Bank.this, AddEditQuestionActivity.class);
             addOrEditQuestionLauncher.launch(intent);
+        });
+        // 1. Ánh xạ các View lọc từ XML
+        etFilterTopic = findViewById(R.id.et_filter_topic);
+        spinnerFilterLevel = findViewById(R.id.spinner_filter_level);
+        btnApplyFilter = findViewById(R.id.btn_apply_filter);
+
+// 2. Tạo danh sách cho Spinner (Từ 0 đến 5)
+        String[] levels = {"Tất cả mức độ", "Mức 1", "Mức 2", "Mức 3", "Mức 4", "Mức 5"};
+        android.widget.ArrayAdapter<String> levelAdapter = new android.widget.ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, levels);
+        levelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFilterLevel.setAdapter(levelAdapter);
+
+// 3. Xử lý sự kiện khi nhấn nút Lọc (Cái kính lúp)
+        btnApplyFilter.setOnClickListener(v -> {
+            String topic = etFilterTopic.getText().toString().trim();
+            int level = spinnerFilterLevel.getSelectedItemPosition(); // 0 = Tất cả, 1 = Mức 1...
+
+            if (topic.isEmpty() && level == 0) {
+                // Nếu không nhập gì, quay lại chế độ xem tất cả thời gian thực
+                questionViewModel.startListening();
+                android.widget.Toast.makeText(this, "Hiển thị tất cả", android.widget.Toast.LENGTH_SHORT).show();
+            } else {
+                // Tắt lắng nghe thời gian thực để thực hiện truy vấn lọc tĩnh
+                questionViewModel.stopListening();
+                questionViewModel.filterQuestions(topic, level);
+                android.widget.Toast.makeText(this, "Đang lọc dữ liệu...", android.widget.Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

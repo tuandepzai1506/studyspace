@@ -138,4 +138,37 @@ public class QuestionViewModel extends ViewModel {
         void onSaveSuccess();
         void onSaveFailure(Exception e);
     }
+    // Trong QuestionViewModel.java
+
+    public void filterQuestions(String topic, Integer level) {
+        Query query = questionsRef;
+
+        // Lọc theo chủ đề (nếu người dùng nhập)
+        if (topic != null && !topic.isEmpty()) {
+            query = query.whereEqualTo("topic", topic);
+        }
+
+        // Lọc theo độ khó (nếu người dùng chọn)
+        if (level != null && level > 0) {
+            query = query.whereEqualTo("level", level);
+        }
+
+        // Lấy dữ liệu và cập nhật LiveData
+        query.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            List<Question> filteredList = new ArrayList<>();
+            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                Question q = doc.toObject(Question.class);
+                q.setId(doc.getId());
+                filteredList.add(q);
+            }
+            questionsLiveData.setValue(filteredList);
+        }).addOnFailureListener(e -> {
+            // Xử lý lỗi nếu cần
+        });
+    }
+
+    // Thêm hàm để reset về danh sách đầy đủ
+    public void clearFilter() {
+        startListening(); // Gọi lại hàm lắng nghe mặc định của bạn
+    }
 }
