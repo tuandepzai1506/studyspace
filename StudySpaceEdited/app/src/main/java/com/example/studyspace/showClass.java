@@ -61,11 +61,18 @@ public class showClass extends AppCompatActivity {
 
         // --- PHẦN THAY ĐỔI QUAN TRỌNG Ở ĐÂY ---
         // Khởi tạo Adapter với Interface lắng nghe sự kiện click
+        // Khởi tạo Adapter với Interface lắng nghe sự kiện click
+        // Trong onCreate của showClass.java
         classAdapter = new ClassAdapter(mListClass, new ClassAdapter.IClickItemClassListener() {
             @Override
             public void onClickItemClass(ClassModel classModel) {
-                // Hàm này sẽ chạy khi người dùng bấm vào 1 lớp học
                 goToChatScreen(classModel);
+            }
+
+            @Override
+            public void onDeleteClick(ClassModel classModel, int position) {
+                // Gọi hàm xác nhận xóa
+                confirmDeleteClass(classModel, position);
             }
         });
 
@@ -134,5 +141,26 @@ public class showClass extends AppCompatActivity {
                         }
                     }
                 });
+    }
+    private void confirmDeleteClass(ClassModel classModel, int position) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Xóa lớp học")
+                .setMessage("Bạn có chắc chắn muốn xóa lớp '" + classModel.getClassName() + "' không?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    // Thực hiện xóa trên Firebase Firestore
+                    db.collection("classes").document(classModel.getClassId())
+                            .delete()
+                            .addOnSuccessListener(aVoid -> {
+                                // Xóa thành công trên Server, tiến hành cập nhật UI cục bộ
+                                // Lưu ý: Nếu bạn dùng addSnapshotListener thì Firebase sẽ tự
+                                // cập nhật mListClass, nhưng gọi lệnh dưới đây sẽ giúp UI mượt hơn ngay lập tức
+                                Toast.makeText(showClass.this, "Đã xóa lớp thành công", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(showClass.this, "Lỗi khi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 }

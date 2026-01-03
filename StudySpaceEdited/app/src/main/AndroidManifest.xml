@@ -61,7 +61,7 @@
             android:exported="false"/>
         <activity android:name=".ClassScoresActivity"
             android:exported="false"/>
-
+        <activity android:name=".ManageMemberActivity" />
     </application>
 
 </manifest>

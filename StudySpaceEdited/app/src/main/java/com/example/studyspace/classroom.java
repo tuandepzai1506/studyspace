@@ -26,7 +26,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-
+import android.content.Intent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -52,7 +52,7 @@ public class classroom extends AppCompatActivity {
     // Adapter và List tin nhắn
     private List<ChatMessage> chatMessages;
     private ChatAdapter chatAdapter;
-
+    private ImageView imageManageMember; // Khai báo ở trên đầu class
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,14 +76,43 @@ public class classroom extends AppCompatActivity {
 
         // 6. Cài đặt sự kiện click
         setListeners();
+        checkTeacherRole();
     }
+    private void checkTeacherRole() {
+        if (classId == null || mAuth.getCurrentUser() == null) return;
 
+        String currentUserId = mAuth.getCurrentUser().getUid();
+
+        // Truy vấn để lấy thông tin lớp học
+        db.collection("classes").document(classId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Lấy ID của người tạo lớp từ trường "userId" trong Firestore
+                        String ownerId = documentSnapshot.getString("userId");
+
+                        if (currentUserId.equals(ownerId)) {
+                            // Nếu là giáo viên: Hiện nút và cài đặt sự kiện click
+                            imageManageMember.setVisibility(View.VISIBLE);
+                            imageManageMember.setOnClickListener(v -> {
+                                Intent intent = new Intent(classroom.this, ManageMemberActivity.class);
+                                intent.putExtra("classId", classId);
+                                startActivity(intent);
+                            });
+                        } else {
+                            // Nếu là học sinh: Ẩn nút hoàn toàn
+                            imageManageMember.setVisibility(View.GONE);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Classroom", "Lỗi kiểm tra quyền: " + e.getMessage()));
+    }
     private void initView() {
         imageBack = findViewById(R.id.imageBack);
         textName = findViewById(R.id.textName);
         chatRecyclerView = findViewById(R.id.chatRecyclerView);
         inputMessage = findViewById(R.id.inputMessage);
         layoutSendBtn = findViewById(R.id.layoutSendBtn);
+        imageManageMember = findViewById(R.id.imageManageMember);
     }
 
     // Hàm nhận dữ liệu từ Intent
