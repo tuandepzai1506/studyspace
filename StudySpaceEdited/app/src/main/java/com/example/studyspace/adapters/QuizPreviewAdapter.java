@@ -35,14 +35,6 @@ public class QuizPreviewAdapter extends RecyclerView.Adapter<QuizPreviewAdapter.
         // Hiển thị số thứ tự câu hỏi
         holder.tvIndex.setText("Câu " + (position + 1) + ":");
         holder.tvContent.setText(question.getQuestionText());
-
-        // Hiển thị đáp án đúng (vì đây là màn hình xem trước đề thi cho giáo viên/admin)
-        // Logic lấy text đáp án dựa trên index
-        String correctAnswerText = "";
-        if (question.getCorrectAnswerIndex() >= 0 && question.getCorrectAnswerIndex() < question.getOptions().size()) {
-            correctAnswerText = question.getOptions().get(question.getCorrectAnswerIndex());
-        }
-        holder.tvAnswer.setText("Đáp án đúng: " + correctAnswerText);
     }
 
     @Override

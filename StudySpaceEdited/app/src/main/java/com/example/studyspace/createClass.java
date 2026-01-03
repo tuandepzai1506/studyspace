@@ -17,10 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList; // Cần import ArrayList
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;      // Cần import List
+import java.util.List;
 import java.util.Map;
 
 public class createClass extends AppCompatActivity {
@@ -57,12 +57,11 @@ public class createClass extends AppCompatActivity {
         dialog.show();
 
         EditText etClassName = popupView.findViewById(R.id.edittext_limit1);
-        EditText etMemberInput  = popupView.findViewById(R.id.edittext_limit2); // Đổi tên biến để tránh nhầm lẫn
+        EditText etMemberInput  = popupView.findViewById(R.id.edittext_limit2);
         Button btnCreate     = popupView.findViewById(R.id.button_create_class);
 
         btnCreate.setOnClickListener(v -> {
             String className = etClassName.getText().toString().trim();
-            // Biến memberInput này là chuỗi (ví dụ mô tả lớp), không dùng cho danh sách thành viên
             String memberInfo   = etMemberInput.getText().toString().trim();
 
             if (TextUtils.isEmpty(className)) {
@@ -77,7 +76,7 @@ public class createClass extends AppCompatActivity {
 
     private void createNewClassOnFirebase(
             String className,
-            String memberInfo, // Biến này chỉ để log hoặc lưu mô tả (nếu cần)
+            String memberInfo,
             AlertDialog dialog) {
 
         FirebaseUser user = mAuth.getCurrentUser();
@@ -88,7 +87,7 @@ public class createClass extends AppCompatActivity {
         // 1. Tạo ID cho lớp học
         String classId = db.collection("classes").document().getId();
 
-        // 2. KHỞI TẠO DANH SÁCH THÀNH VIÊN (Quan trọng: Phải là List<String>)
+        // 2. KHỞI TẠO DANH SÁCH THÀNH VIÊN
         List<String> initialMembers = new ArrayList<>();
         initialMembers.add(userId); // Thêm giáo viên vào lớp đầu tiên
 
@@ -96,7 +95,7 @@ public class createClass extends AppCompatActivity {
         ClassModel newClass = new ClassModel(
                 classId,
                 className,
-                initialMembers, // Truyền List vào đây (Không truyền String memberInfo)
+                initialMembers,
                 userId
         );
 
@@ -114,7 +113,6 @@ public class createClass extends AppCompatActivity {
                 });
     }
 
-    // Hàm riêng để gửi tin nhắn chào mừng
     private void sendWelcomeMessage(String classId, String senderId, AlertDialog dialog) {
         // Nội dung tin nhắn chứa ID lớp
         String messageContent = "Mã lớp học: " + classId;
@@ -133,9 +131,8 @@ public class createClass extends AppCompatActivity {
                     dialog.dismiss();
                 })
                 .addOnFailureListener(e -> {
-                    // Nếu gửi tin nhắn lỗi thì vẫn báo tạo lớp xong
                     Toast.makeText(this, "Tạo lớp xong nhưng lỗi gửi tin nhắn.", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
-                }); // <-- Đã thêm dấu chấm phẩy ở đây
+                });
     }
 }

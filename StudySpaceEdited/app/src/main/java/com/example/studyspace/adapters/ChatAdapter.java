@@ -21,8 +21,8 @@ import java.util.Locale;
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<ChatMessage> chatMessages;
-    private final String senderId; // ID của người dùng hiện tại (để so sánh)
-    private String classId; // ID của lớp học
+    private final String senderId; // ID của người dùng hiện tại
+    private String classId;
 
     // Định nghĩa 2 loại tin nhắn
     public static final int VIEW_TYPE_SENT = 1;
@@ -34,7 +34,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.classId = classId;
     }
 
-    // Hàm quan trọng nhất: Quyết định xem tin nhắn này là GỬI hay NHẬN
     @Override
     public int getItemViewType(int position) {
         if (chatMessages.get(position).getSenderId().equals(senderId)) {

@@ -15,8 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.studyspace.adapters.ChatAdapter; // Bạn cần tạo file này
-import com.example.studyspace.models.ChatMessage;   // Bạn cần tạo file này
+import com.example.studyspace.adapters.ChatAdapter;
+import com.example.studyspace.models.ChatMessage;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -124,7 +124,7 @@ public class classroom extends AppCompatActivity {
         String messageText = inputMessage.getText().toString().trim();
 
         if (TextUtils.isEmpty(messageText)) {
-            return; // Không gửi nếu rỗng
+            return;
         }
 
         // Tạo dữ liệu tin nhắn để gửi lên Firebase
@@ -149,8 +149,6 @@ public class classroom extends AppCompatActivity {
 
     private void listenMessages() {
         if (classId == null) return;
-
-        // Lắng nghe thay đổi trong collection "messages" của lớp này
         db.collection("classes").document(classId).collection("messages")
                 .orderBy("timestamp") // Sắp xếp theo thời gian
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -168,9 +166,6 @@ public class classroom extends AppCompatActivity {
                                     chatMessages.add(chatMessage);
                                 }
                             }
-
-                            // Sắp xếp lại list (nếu cần) hoặc notify adapter
-                            // Vì đã orderBy timestamp từ query nên thường sẽ đúng thứ tự
 
                             if (count == 0) {
                                 chatAdapter.notifyDataSetChanged();

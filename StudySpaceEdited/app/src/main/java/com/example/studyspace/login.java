@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-// Import Firestore để lấy Role
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -30,7 +29,7 @@ public class login extends AppCompatActivity {
     private TextView tvRegister, tvForgotPass;
 
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db; // 1. Khai báo Firestore
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +37,7 @@ public class login extends AppCompatActivity {
         setContentView(R.layout.login);
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance(); // 2. Khởi tạo Firestore
-
+        db = FirebaseFirestore.getInstance();
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
