@@ -55,7 +55,7 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
     implementation("com.google.code.gson:gson:2.10.1")
-
+    implementation("androidx.gridlayout:gridlayout:1.0.0")
     // --- TEST ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
