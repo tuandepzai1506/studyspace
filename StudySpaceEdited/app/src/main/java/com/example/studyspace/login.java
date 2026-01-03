@@ -108,6 +108,11 @@ public class login extends AppCompatActivity {
                                 Toast.makeText(login.this, "Xin chào Học sinh!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(login.this, StudentActivity.class);
                                 startActivity(intent);
+                            } else if (role.equals("admin")) {
+                                Toast.makeText(login.this, "Xin chào Admin!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(login.this, AdminManageUsersActivity.class);
+                                startActivity(intent);
+
                             }
                         }
                         Toast.makeText(login.this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
