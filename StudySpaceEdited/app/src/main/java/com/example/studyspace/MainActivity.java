@@ -16,154 +16,142 @@ import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private BottomNavigationView bottomNavigationView;
-    FirebaseFirestore db;
-    FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+    private TextView username, MyEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_act);
+
+        // 1. Khởi tạo Firebase
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Khởi tạo Drawer và BottomNavigation
+        // 2. Ánh xạ View
         drawerLayout = findViewById(R.id.drawer_layout);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        TextView username = findViewById(R.id.tv_username);
-        String userId = mAuth.getCurrentUser().getUid();
+        username = findViewById(R.id.tv_username);
+        MyEmail = findViewById(R.id.tv_email);
 
-        db.collection("users").document(userId).get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+        // 3. Kiểm tra User và Role (Admin/Student)
+        checkUserRole();
+
+        // 4. Thiết lập sự kiện cho các nút
+        setupButtons();
+
+        // 5. Thiết lập Menu Bottom
+        setupBottomNavigation();
+    }
+
+    private void checkUserRole() {
+        if (mAuth.getCurrentUser() != null) {
+            String userId = mAuth.getCurrentUser().getUid();
+
+            // ÉP BUỘC LẤY DỮ LIỆU TỪ SERVER (Không dùng cache)
+            db.collection("users").document(userId).get(com.google.firebase.firestore.Source.SERVER)
+                    .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("fullName");
-                            username.setText(name);
-                        }
-                    }
-                });
-        TextView MyEmail = findViewById(R.id.tv_email);
-        String UserEmail = mAuth.getCurrentUser().getEmail();
-        db.collection("users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot.exists()){
-                    String email = documentSnapshot.getString("email");
-                    MyEmail.setText(email);
-                }
-            }
-        });
+                            String role = documentSnapshot.getString("role");
+                            // In ra Logcat để kiểm tra chính xác giá trị role nhận được
+                            android.util.Log.d("ADMIN_CHECK", "Role tren Server la: " + role);
 
-        // Nút Add (ImageView)
-        ImageView createClass = findViewById(R.id.classCreate);
-        if (createClass != null) {
-            createClass.setOnClickListener(v -> {
-                runAnimationAndSwitchActivity(v, createClass.class);
-            });
+                            if ("admin".equals(role)) {
+                                startActivity(new Intent(MainActivity.this, AdminDashboardActivity.class));
+                                finish();
+                            } else {
+                                username.setText(documentSnapshot.getString("fullName"));
+                                MyEmail.setText(documentSnapshot.getString("email"));
+                            }
+                        } else {
+                            // HIỂN THỊ THÔNG TIN CHI TIẾT ĐỂ ĐỐI CHIẾU
+                            String errorInfo = "ID dang tim: " + userId + "\nEmail: " + mAuth.getCurrentUser().getEmail();
+                            username.setText("KHÔNG TÌM THẤY TRÊN DATABASE!");
+
+                            // Hiển thị Dialog chứa ID để bạn copy
+                            new androidx.appcompat.app.AlertDialog.Builder(this)
+                                    .setTitle("Thông tin định danh")
+                                    .setMessage(errorInfo)
+                                    .setPositiveButton("Đã hiểu", null)
+                                    .show();
+
+                            android.util.Log.e("ADMIN_CHECK", errorInfo);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Lỗi kết nối Server: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
         }
+    }
+
+    private void setupButtons() {
+        // Nút Tạo lớp (ImageView)
+        ImageView createClass = findViewById(R.id.classCreate);
+        if (createClass != null) createClass.setOnClickListener(v -> runAnimationAndSwitchActivity(v, createClass.class));
+
         // Nút Tạo bộ đề (CardView)
         CardView makeTest = findViewById(R.id.makeTest);
-        if (makeTest != null) {
-            makeTest.setOnClickListener(v -> {
-                runAnimationAndSwitchActivity(v, TaoBoDe.class);
-            });
-        }
+        if (makeTest != null) makeTest.setOnClickListener(v -> runAnimationAndSwitchActivity(v, TaoBoDe.class));
+
         // Nút Ngân hàng câu hỏi (CardView)
         CardView qs_bank = findViewById(R.id.button_question_bank);
-        if (qs_bank != null){
-            qs_bank.setOnClickListener(v ->{
-                runAnimationAndSwitchActivity(v, Question_Bank.class);
-            });
-        }
+        if (qs_bank != null) qs_bank.setOnClickListener(v -> runAnimationAndSwitchActivity(v, Question_Bank.class));
 
-        // Nút Tạo lớp (CardView)
+        // Nút Xem lớp (CardView)
         CardView showClass = findViewById(R.id.showClass);
-        if (showClass != null){
-            showClass.setOnClickListener(v ->{
-                runAnimationAndSwitchActivity(v, showClass.class);
-            });
-        }
+        if (showClass != null) showClass.setOnClickListener(v -> runAnimationAndSwitchActivity(v, showClass.class));
 
         // Nút Bảng điểm (CardView)
         CardView bangDiem = findViewById(R.id.bangDiem);
-        if (bangDiem != null){
-            bangDiem.setOnClickListener(v ->{
-                runAnimationAndSwitchActivity(v, ClassScoresActivity.class);
-            });
-        }
+        if (bangDiem != null) bangDiem.setOnClickListener(v -> runAnimationAndSwitchActivity(v, ClassScoresActivity.class));
+
+        // Nút Đăng xuất
         Button btn_logout = findViewById(R.id.btn_logout);
-        if (btn_logout != null) {
-            btn_logout.setOnClickListener(v -> {
-                    runAnimationAndSwitchActivity(v, login.class);
-            });
-        }
+        if (btn_logout != null) btn_logout.setOnClickListener(v -> runAnimationAndSwitchActivity(v, login.class));
+    }
 
-
-        // --- XỬ LÝ MENU BOTTOM ---
+    private void setupBottomNavigation() {
         if (bottomNavigationView != null) {
-            bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    int id = item.getItemId();
-                    if (id == R.id.nav_profile) {
-                        if (drawerLayout != null) {
-                            drawerLayout.openDrawer(GravityCompat.END);
-                            return true;
-                        } else {
-                            Toast.makeText(MainActivity.this, "Lỗi: Không tìm thấy ID drawer_layout trong XML!", Toast.LENGTH_LONG).show();
-                            return false;
-                        }
-                    }else if (id == R.id.nav_class) {
-                        Intent intent = new Intent(MainActivity.this, showClass.class);
-                        startActivity(intent);
-                        return true;
-                    }
-                    else if (id == R.id.action_home){
-                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        return true;
-                    }
-                    return false;
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_profile) {
+                    if (drawerLayout != null) drawerLayout.openDrawer(GravityCompat.END);
+                } else if (id == R.id.nav_class) {
+                    startActivity(new Intent(MainActivity.this, showClass.class));
+                } else if (id == R.id.action_home) {
+                    // Đang ở Home rồi không cần làm gì
                 }
+                return true;
             });
-        } else {
-            Toast.makeText(MainActivity.this, "Lỗi: Không tìm thấy BottomNavigation!", Toast.LENGTH_SHORT).show();
         }
     }
-    // Hàm phụ để xử lý animation và chuyển trang
+
     private void runAnimationAndSwitchActivity(android.view.View v, Class<?> destinationActivity) {
         try {
-            Animation flashAnim = AnimationUtils.loadAnimation(MainActivity.this, R.anim.button_press_animation);
+            Animation flashAnim = AnimationUtils.loadAnimation(this, R.anim.button_press_animation);
             v.startAnimation(flashAnim);
-
             flashAnim.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {}
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    Intent intent = new Intent(MainActivity.this, destinationActivity);
-                    startActivity(intent);
+                @Override public void onAnimationStart(Animation animation) {}
+                @Override public void onAnimationRepeat(Animation animation) {}
+                @Override public void onAnimationEnd(Animation animation) {
+                    startActivity(new Intent(MainActivity.this, destinationActivity));
                 }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {}
             });
         } catch (Exception e) {
-            // Nếu lỗi animation thì chuyển trang luôn
-            Intent intent = new Intent(MainActivity.this, destinationActivity);
-            startActivity(intent);
+            startActivity(new Intent(MainActivity.this, destinationActivity));
         }
     }
 }

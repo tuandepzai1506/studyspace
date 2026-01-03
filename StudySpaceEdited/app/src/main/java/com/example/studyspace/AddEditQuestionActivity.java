@@ -28,7 +28,7 @@ public class AddEditQuestionActivity extends AppCompatActivity {
     private TextInputEditText etQuestionText, etOption1, etOption2, etOption3, etOption4, etTopic;
     private Spinner spinnerLevel;
     private Button btnSave;
-
+    private String existingQuestionId = null; // null là thêm mới, có giá trị là sửa
     // MỚI: Khai báo biến RadioGroup để chọn đáp án đúng
     private RadioGroup rgCorrectAnswer;
 
@@ -53,7 +53,10 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         rgCorrectAnswer = findViewById(R.id.rg_correct_answer);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar_add_edit);
-
+        if (getIntent().hasExtra("EXTRA_QUESTION_ID")) {
+            existingQuestionId = getIntent().getStringExtra("EXTRA_QUESTION_ID");
+            loadQuestionData(existingQuestionId); // Gọi hàm load
+        }
         // Thiết lập Spinner cho độ khó
         setupLevelSpinner();
 
@@ -63,7 +66,6 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         // Xử lý nút Lưu
         btnSave.setOnClickListener(v -> saveQuestion());
     }
-
     private void setupLevelSpinner() {
         // Tạo dữ liệu cho Spinner (Độ khó 1-5)
         Integer[] levels = new Integer[]{1, 2, 3, 4, 5};
@@ -79,60 +81,110 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         String option3 = etOption3.getText().toString().trim();
         String option4 = etOption4.getText().toString().trim();
         String topic = etTopic.getText().toString().trim();
+
+        // Kiểm tra Spinner tránh lỗi NullPointer
+        if (spinnerLevel.getSelectedItem() == null) return;
         int level = (Integer) spinnerLevel.getSelectedItem();
 
-        Log.d(TAG, "== BẮT ĐẦU LƯU ==");
-
-        // 1. Kiểm tra dữ liệu đầu vào cơ bản
-        if (TextUtils.isEmpty(questionText) || TextUtils.isEmpty(option1) || TextUtils.isEmpty(option2) || TextUtils.isEmpty(topic)) {
+        // 1. Kiểm tra dữ liệu đầu vào
+        if (TextUtils.isEmpty(questionText) || TextUtils.isEmpty(option1) ||
+                TextUtils.isEmpty(option2) || TextUtils.isEmpty(topic)) {
             Toast.makeText(this, "Vui lòng nhập đủ: Câu hỏi, Đáp án A, B và Chủ đề", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // 2. Tạo danh sách đáp án
         List<String> options = new ArrayList<>();
-        options.add(option1); // Index 0
-        options.add(option2); // Index 1
-        if (!option3.isEmpty()) options.add(option3); // Index 2 (nếu có)
-        if (!option4.isEmpty()) options.add(option4); // Index 3 (nếu có)
+        options.add(option1);
+        options.add(option2);
+        if (!option3.isEmpty()) options.add(option3);
+        if (!option4.isEmpty()) options.add(option4);
 
-        // 3. XÁC ĐỊNH ĐÁP ÁN ĐÚNG (Dựa vào RadioGroup)
-        int correctIndex = 0; // Mặc định là A (0)
+        // 3. Xác định đáp án đúng
+        int correctIndex = 0;
         int checkedId = rgCorrectAnswer.getCheckedRadioButtonId();
+        if (checkedId == R.id.rb_option_b) correctIndex = 1;
+        else if (checkedId == R.id.rb_option_c) correctIndex = 2;
+        else if (checkedId == R.id.rb_option_d) correctIndex = 3;
 
-        if (checkedId == R.id.rb_option_b) {
-            correctIndex = 1;
-        } else if (checkedId == R.id.rb_option_c) {
-            correctIndex = 2;
-        } else if (checkedId == R.id.rb_option_d) {
-            correctIndex = 3;
-        }
-
-        // 4. KIỂM TRA LOGIC QUAN TRỌNG:
-        // Nếu chọn đáp án đúng là C (index 2) mà danh sách chỉ có 2 phần tử (A, B) -> Lỗi
         if (correctIndex >= options.size()) {
-            Toast.makeText(this, "Đáp án đúng bạn chọn (" + (correctIndex == 2 ? "C" : "D") + ") chưa có nội dung!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đáp án đúng chưa có nội dung!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 5. Tạo đối tượng Question (Truyền correctIndex vào thay vì số 0)
-        Question newQuestion = new Question(questionText, options, correctIndex, topic, level);
+        // 4. Khóa nút lưu để tránh nhấn nhiều lần
+        btnSave.setEnabled(false);
 
-        // 6. Gọi ViewModel để lưu
-        Log.d(TAG, "Đang gọi questionViewModel.addQuestion...");
-        questionViewModel.addQuestion(newQuestion, new QuestionViewModel.OnSaveCompleteListener() {
-            @Override
-            public void onSaveSuccess() {
-                Log.d(TAG, "LƯU THÀNH CÔNG.");
-                Toast.makeText(AddEditQuestionActivity.this, "Thêm câu hỏi thành công!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        // 5. Tạo đối tượng Question
+        Question question = new Question(questionText, options, correctIndex, topic, level);
 
-            @Override
-            public void onSaveFailure(Exception e) {
-                Log.e(TAG, "LƯU THẤT BẠI.", e);
-                Toast.makeText(AddEditQuestionActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        // 6. LUỒNG LOGIC CHÍNH: Phân biệt Thêm và Sửa
+        if (existingQuestionId != null) {
+            // CHẾ ĐỘ SỬA
+            question.setId(existingQuestionId);
+            updateQuestion(question);
+        } else {
+            // CHẾ ĐỘ THÊM MỚI (Chỉ gọi 1 lần duy nhất ở đây)
+            questionViewModel.addQuestion(question, new QuestionViewModel.OnSaveCompleteListener() {
+                @Override
+                public void onSaveSuccess() {
+                    Toast.makeText(AddEditQuestionActivity.this, "Thêm câu hỏi thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                }
+
+                @Override
+                public void onSaveFailure(Exception e) {
+                    btnSave.setEnabled(true); // Mở lại nút nếu lỗi
+                    Toast.makeText(AddEditQuestionActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+    private void loadQuestionData(String id) {
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("questions").document(id).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Question q = documentSnapshot.toObject(Question.class);
+                    if (q != null) {
+                        etQuestionText.setText(q.getQuestionText());
+                        etTopic.setText(q.getTopic());
+
+                        List<String> opts = q.getOptions();
+                        if (opts != null && opts.size() >= 2) {
+                            etOption1.setText(opts.get(0));
+                            etOption2.setText(opts.get(1));
+                            if (opts.size() > 2) etOption3.setText(opts.get(2));
+                            if (opts.size() > 3) etOption4.setText(opts.get(3));
+                        }
+
+                        // Set đáp án đúng
+                        int correctIndex = q.getCorrectAnswerIndex();
+                        if (correctIndex == 0) rgCorrectAnswer.check(R.id.rb_option_a);
+                        else if (correctIndex == 1) rgCorrectAnswer.check(R.id.rb_option_b);
+                        else if (correctIndex == 2) rgCorrectAnswer.check(R.id.rb_option_c);
+                        else if (correctIndex == 3) rgCorrectAnswer.check(R.id.rb_option_d);
+
+                        // Set độ khó
+                        spinnerLevel.setSelection(q.getLevel() - 1);
+                    }
+                });
+    }
+    private void updateQuestion(Question question) {
+        // 1. Tham chiếu đến đúng Document ID đang cần sửa
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("questions")
+                .document(existingQuestionId) // Dùng ID đã nhận được từ Intent
+                .set(question) // .set() sẽ ghi đè toàn bộ dữ liệu mới lên ID cũ này
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Cập nhật thành công ID: " + existingQuestionId);
+                    Toast.makeText(this, "Cập nhật câu hỏi thành công!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK); // Thông báo cho màn hình danh sách biết để load lại dữ liệu
+                    finish(); // Đóng màn hình
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Lỗi cập nhật: ", e);
+                    Toast.makeText(this, "Lỗi khi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }
