@@ -49,6 +49,12 @@ public class AddEditQuestionActivity extends AppCompatActivity {
         spinnerLevel = findViewById(R.id.spinner_level);
         btnSave = findViewById(R.id.button_save);
 
+        String defaultTopic = getIntent().getStringExtra("DEFAULT_TOPIC");
+        if (defaultTopic != null) {
+            etTopic.setText(defaultTopic);
+            etTopic.setEnabled(false); // Khóa ô để giáo viên không sửa nhầm môn
+            // Nếu muốn gọn hơn, bạn có thể dùng: etTopic.setVisibility(android.view.View.GONE);
+        }
         // MỚI: Ánh xạ RadioGroup (ID phải trùng với file XML vừa sửa)
         rgCorrectAnswer = findViewById(R.id.rg_correct_answer);
 

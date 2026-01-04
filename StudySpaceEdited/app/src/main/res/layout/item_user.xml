@@ -51,5 +51,14 @@
             android:text="Đổi Quyền"
             android:textSize="12sp"
             style="@style/Widget.AppCompat.Button.Colored"/>
+        <Button
+            android:id="@+id/btn_delete_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xóa"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#F44336"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.AppCompat.Button.Colored"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

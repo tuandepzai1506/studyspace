@@ -29,8 +29,18 @@ public class AdminManageUsersActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.rv_all_users);
         userList = new ArrayList<>();
 
-        // Khởi tạo Adapter với sự kiện đổi quyền (Role)
-        adapter = new UserAdapter(userList, user -> showChangeRoleDialog(user));
+        // CẬP NHẬT: Khởi tạo Adapter với cả 2 sự kiện: Đổi quyền và Xóa
+        adapter = new UserAdapter(userList, new UserAdapter.OnUserActionListener() {
+            @Override
+            public void onChangeRole(User user) {
+                showChangeRoleDialog(user);
+            }
+
+            @Override
+            public void onDeleteUser(User user) {
+                showDeleteConfirmDialog(user); // Gọi hàm xác nhận xóa
+            }
+        });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -38,8 +48,33 @@ public class AdminManageUsersActivity extends AppCompatActivity {
         loadAllUsers();
     }
 
+    // --- HÀM XÁC NHẬN XÓA ---
+    private void showDeleteConfirmDialog(User user) {
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận xóa")
+                .setMessage("Bạn có chắc chắn muốn xóa người dùng " + user.getFullName() + "?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    deleteUserFromFirestore(user);
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    // --- HÀM THỰC HIỆN XÓA TRÊN FIRESTORE ---
+    private void deleteUserFromFirestore(User user) {
+        db.collection("users").document(user.getUserId())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    userList.remove(user); // Xóa khỏi danh sách hiển thị
+                    adapter.notifyDataSetChanged(); // Cập nhật lại giao diện
+                    Toast.makeText(this, "Đã xóa người dùng thành công", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi khi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+    }
+
     private void loadAllUsers() {
-        // Lấy tất cả người dùng trong hệ thống
         db.collection("users").get().addOnSuccessListener(queryDocumentSnapshots -> {
             userList.clear();
             for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
@@ -67,7 +102,7 @@ public class AdminManageUsersActivity extends AppCompatActivity {
 
     private void updateUserRole(User user, String newRole) {
         db.collection("users").document(user.getUserId())
-                .update("role", newRole) // Cập nhật role mới lên Firestore
+                .update("role", newRole)
                 .addOnSuccessListener(aVoid -> {
                     user.setRole(newRole);
                     adapter.notifyDataSetChanged();

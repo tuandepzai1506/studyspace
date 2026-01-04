@@ -17,6 +17,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     public interface OnUserActionListener {
         void onChangeRole(User user);
+        void onDeleteUser(User user);
     }
 
     public UserAdapter(List<User> userList, OnUserActionListener listener) {
@@ -39,6 +40,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.tvRole.setText("Vai trò: " + user.getRole());
 
         holder.btnChangeRole.setOnClickListener(v -> listener.onChangeRole(user));
+        holder.btnDeleteUser.setOnClickListener(v -> listener.onDeleteUser(user));
     }
 
     @Override
@@ -46,7 +48,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvEmail, tvRole;
-        Button btnChangeRole;
+        Button btnChangeRole, btnDeleteUser;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -54,6 +56,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             tvEmail = itemView.findViewById(R.id.tv_user_email);
             tvRole = itemView.findViewById(R.id.tv_user_role);
             btnChangeRole = itemView.findViewById(R.id.btn_change_role);
+            btnDeleteUser = itemView.findViewById(R.id.btn_delete_user);
         }
     }
 }

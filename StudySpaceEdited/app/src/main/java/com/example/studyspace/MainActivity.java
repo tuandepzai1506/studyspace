@@ -70,8 +70,10 @@ public class MainActivity extends AppCompatActivity {
                             android.util.Log.d("ADMIN_CHECK", "Role tren Server la: " + role);
 
                             if ("admin".equals(role)) {
-                                startActivity(new Intent(MainActivity.this, AdminDashboardActivity.class));
-                                finish();
+                                    Intent intent = new Intent(MainActivity.this, AdminDashboardActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                    return;
                             } else {
                                 username.setText(documentSnapshot.getString("fullName"));
                                 MyEmail.setText(documentSnapshot.getString("email"));
@@ -108,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Nút Ngân hàng câu hỏi (CardView)
         CardView qs_bank = findViewById(R.id.button_question_bank);
-        if (qs_bank != null) qs_bank.setOnClickListener(v -> runAnimationAndSwitchActivity(v, Question_Bank.class));
+        if (qs_bank != null) qs_bank.setOnClickListener(v -> runAnimationAndSwitchActivity(v, SubjectSelectionActivity.class));
 
         // Nút Xem lớp (CardView)
         CardView showClass = findViewById(R.id.showClass);

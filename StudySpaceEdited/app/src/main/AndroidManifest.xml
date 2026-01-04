@@ -67,6 +67,11 @@
         <activity
             android:name=".AdminManageUsersActivity"
             android:exported="false" />
+        <activity
+            android:name=".SubjectSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
     </application>
 
 </manifest>
