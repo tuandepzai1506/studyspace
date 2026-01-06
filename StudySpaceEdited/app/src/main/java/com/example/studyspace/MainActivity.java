@@ -2,6 +2,7 @@ package com.example.studyspace;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings; // THÊM: Để lấy mã ID thiết bị
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -21,6 +22,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration; // THÊM: Quản lý bộ lắng nghe
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private TextView username, MyEmail;
+    private ListenerRegistration userListener; // THÊM: Khai báo bộ lắng nghe để giải phóng khi cần
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +64,34 @@ public class MainActivity extends AppCompatActivity {
         if (mAuth.getCurrentUser() != null) {
             String userId = mAuth.getCurrentUser().getUid();
 
-            // ÉP BUỘC LẤY DỮ LIỆU TỪ SERVER (Không dùng cache)
-            db.collection("users").document(userId).get(com.google.firebase.firestore.Source.SERVER)
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
+            // CẬP NHẬT: Lấy mã ID của thiết bị hiện tại đang cầm trên tay
+            String myDeviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+            // CẬP NHẬT: Thay đổi từ .get() sang .addSnapshotListener để lắng nghe thay đổi thời gian thực
+            userListener = db.collection("users").document(userId)
+                    .addSnapshotListener((documentSnapshot, e) -> {
+                        if (e != null) {
+                            android.util.Log.e("AUTH_CHECK", "Lỗi lắng nghe: " + e.getMessage());
+                            return;
+                        }
+
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            // BƯỚC QUAN TRỌNG: Kiểm tra mã thiết bị trên Server
+                            String serverDeviceId = documentSnapshot.getString("currentDeviceId");
+
+                            // KIỂM TRA: Nếu mã trên Server khác mã máy này -> Có người khác vừa đăng nhập ở máy mới
+                            if (serverDeviceId != null && !serverDeviceId.equals(myDeviceId)) {
+                                showForceLogoutDialog();
+                                return; // Dừng xử lý các lệnh bên dưới
+                            }
+
                             String role = documentSnapshot.getString("role");
-                            // In ra Logcat để kiểm tra chính xác giá trị role nhận được
                             android.util.Log.d("ADMIN_CHECK", "Role tren Server la: " + role);
 
                             if ("admin".equals(role)) {
-                                    Intent intent = new Intent(MainActivity.this, AdminDashboardActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                    return;
+                                Intent intent = new Intent(MainActivity.this, AdminDashboardActivity.class);
+                                startActivity(intent);
+                                finish();
                             } else {
                                 username.setText(documentSnapshot.getString("fullName"));
                                 MyEmail.setText(documentSnapshot.getString("email"));
@@ -83,20 +101,34 @@ public class MainActivity extends AppCompatActivity {
                             String errorInfo = "ID dang tim: " + userId + "\nEmail: " + mAuth.getCurrentUser().getEmail();
                             username.setText("KHÔNG TÌM THẤY TRÊN DATABASE!");
 
-                            // Hiển thị Dialog chứa ID để bạn copy
                             new androidx.appcompat.app.AlertDialog.Builder(this)
                                     .setTitle("Thông tin định danh")
                                     .setMessage(errorInfo)
                                     .setPositiveButton("Đã hiểu", null)
                                     .show();
-
-                            android.util.Log.e("ADMIN_CHECK", errorInfo);
                         }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Lỗi kết nối Server: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     });
         }
+    }
+
+    // THÊM: Hàm hiển thị thông báo và cưỡng ép đăng xuất
+    private void showForceLogoutDialog() {
+        if (isFinishing()) return;
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Cảnh báo bảo mật")
+                .setMessage("Tài khoản của bạn vừa được đăng nhập ở một thiết bị khác. Bạn sẽ bị đăng xuất khỏi thiết bị này.")
+                .setCancelable(false) // Không cho phép nhấn ra ngoài để bỏ qua
+                .setPositiveButton("Đồng ý", (dialog, which) -> {
+                    if (userListener != null) userListener.remove(); // Gỡ bộ lắng nghe
+                    mAuth.signOut(); // Đăng xuất Firebase
+                    Intent intent = new Intent(MainActivity.this, login.class);
+                    // Xóa sạch lịch sử các màn hình trước đó
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .show();
     }
 
     private void setupButtons() {
@@ -155,5 +187,12 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             startActivity(new Intent(MainActivity.this, destinationActivity));
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // THÊM: Giải phóng bộ lắng nghe khi hủy Activity để tránh rò rỉ bộ nhớ
+        if (userListener != null) userListener.remove();
     }
 }

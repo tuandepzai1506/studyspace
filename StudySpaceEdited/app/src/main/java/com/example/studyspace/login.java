@@ -2,6 +2,7 @@ package com.example.studyspace;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings; // CẬP NHẬT: Import để lấy ID thiết bị
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.TextView;
@@ -89,11 +90,18 @@ public class login extends AppCompatActivity {
 
         String userId = user.getUid();
 
+        // CẬP NHẬT: Lấy ID duy nhất của thiết bị hiện tại
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
         // Giả sử bạn lưu thông tin user trong collection "users"
         db.collection("users").document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
+
+                        // CẬP NHẬT: Ghi đè Device ID mới lên Firestore ngay khi đăng nhập thành công
+                        // Điều này sẽ kích hoạt addSnapshotListener ở các thiết bị khác đang dùng cùng tài khoản
+                        db.collection("users").document(userId).update("currentDeviceId", deviceId);
 
                         String role = documentSnapshot.getString("role");
 
@@ -103,19 +111,22 @@ public class login extends AppCompatActivity {
                                 Toast.makeText(login.this, "Xin chào Giáo viên!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(login.this, MainActivity.class);
                                 startActivity(intent);
+                                finish(); // CẬP NHẬT: Kết thúc Activity login
                             } else if (role.equals("student")) {
                                 // === TRƯỜNG HỢP HỌC SINH ===
                                 Toast.makeText(login.this, "Xin chào Học sinh!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(login.this, StudentActivity.class);
                                 startActivity(intent);
+                                finish(); // CẬP NHẬT: Kết thúc Activity login
                             } else if (role.equals("admin")) {
                                 Toast.makeText(login.this, "Xin chào Admin!", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(login.this, AdminDashboardActivity.class);
                                 startActivity(intent);
                                 finish();
                             }
+                        } else {
+                            Toast.makeText(login.this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(login.this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
