@@ -141,19 +141,20 @@ public class QuestionViewModel extends ViewModel {
     // Trong QuestionViewModel.java
 
     public void filterQuestions(String topic, Integer level) {
+        // Luôn bắt đầu từ tham chiếu gốc
         Query query = questionsRef;
 
-        // Lọc theo chủ đề (nếu người dùng nhập)
+        // 1. LUÔN LỌC THEO CHỦ ĐỀ TRƯỚC (Rất quan trọng)
         if (topic != null && !topic.isEmpty()) {
             query = query.whereEqualTo("topic", topic);
         }
 
-        // Lọc theo độ khó (nếu người dùng chọn)
+        // 2. LỌC THÊM THEO ĐỘ KHÓ (Nếu có chọn mức độ > 0)
         if (level != null && level > 0) {
             query = query.whereEqualTo("level", level);
         }
 
-        // Lấy dữ liệu và cập nhật LiveData
+        // 3. Thực hiện truy vấn và cập nhật LiveData
         query.get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<Question> filteredList = new ArrayList<>();
             for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
@@ -163,7 +164,8 @@ public class QuestionViewModel extends ViewModel {
             }
             questionsLiveData.setValue(filteredList);
         }).addOnFailureListener(e -> {
-            // Xử lý lỗi nếu cần
+            // Gợi ý: Nếu gặp lỗi tại đây, có thể do bạn chưa tạo Index trên Firestore
+            // Hãy kiểm tra Logcat để lấy link tạo Composite Index.
         });
     }
 

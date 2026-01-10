@@ -124,13 +124,21 @@ public class Question_Bank extends AppCompatActivity {
 
         // Nút lọc cũ (vẫn giữ lại để lọc theo mức độ nếu cần, nhưng gõ chữ sẽ ưu tiên lọc ký tự)
         btnApplyFilter.setOnClickListener(v -> {
-            String topic = etFilterTopic.getText().toString().trim();
+            // Lấy mức độ từ Spinner (0: Tất cả, 1: Mức 1...)
             int level = spinnerFilterLevel.getSelectedItemPosition();
-            if (topic.isEmpty() && level == 0) {
-                questionViewModel.startListening();
+
+            // Quan trọng: Luôn truyền selectedSubjectId để đảm bảo chỉ lọc trong môn này
+            if (selectedSubjectId != null && !selectedSubjectId.isEmpty()) {
+                questionViewModel.stopListening(); // Dừng lắng nghe realtime để truy vấn lọc
+
+                // Gọi hàm lọc với CẢ 2 điều kiện: Topic cố định và Level từ Spinner
+                questionViewModel.filterQuestions(selectedSubjectId, level);
+
+                Toast.makeText(this, "Đang lọc mức độ " + level + " cho môn này", Toast.LENGTH_SHORT).show();
             } else {
-                questionViewModel.stopListening();
-                questionViewModel.filterQuestions(topic, level);
+                // Trường hợp dự phòng nếu không có ID môn học thì lọc theo text trong ô Search
+                String topicInput = etFilterTopic.getText().toString().trim();
+                questionViewModel.filterQuestions(topicInput, level);
             }
         });
     }
