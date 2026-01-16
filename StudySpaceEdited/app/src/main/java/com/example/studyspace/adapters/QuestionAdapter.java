@@ -60,14 +60,14 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Questi
             buttonDelete = itemView.findViewById(R.id.button_delete);
 
             buttonEdit.setOnClickListener(v -> {
-                int position = getBindingAdapterPosition(); // Thay thế getAdapterPosition()
+                int position = getBindingAdapterPosition();
                 if (listener != null && position != RecyclerView.NO_POSITION) {
                     listener.onEditClick(questions.get(position));
                 }
             });
 
             buttonDelete.setOnClickListener(v -> {
-                int position = getBindingAdapterPosition(); // Thay thế getAdapterPosition()
+                int position = getBindingAdapterPosition();
                 if (listener != null && position != RecyclerView.NO_POSITION) {
                     listener.onDeleteClick(questions.get(position));
                 }

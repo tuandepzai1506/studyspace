@@ -18,6 +18,7 @@ public class ClassScoresAdapter extends RecyclerView.Adapter<ClassScoresAdapter.
     private List<StudentScoreData> scoreList;
 
     public ClassScoresAdapter(List<StudentScoreData> scoreList) {
+
         this.scoreList = scoreList;
     }
 
