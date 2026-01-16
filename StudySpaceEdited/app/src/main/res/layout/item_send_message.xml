@@ -27,7 +27,9 @@
                 android:padding="12dp"
                 android:text="Nội dung tin nhắn"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textIsSelectable="true"
+                android:textColorHighlight="#B3E5FC"/>
 
             <Button
                 android:id="@+id/btnStartQuiz"

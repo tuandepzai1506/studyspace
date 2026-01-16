@@ -1,11 +1,14 @@
 package com.example.studyspace.adapters;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,10 +24,9 @@ import java.util.Locale;
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final List<ChatMessage> chatMessages;
-    private final String senderId; // ID của người dùng hiện tại
+    private final String senderId;
     private String classId;
 
-    // Định nghĩa 2 loại tin nhắn
     public static final int VIEW_TYPE_SENT = 1;
     public static final int VIEW_TYPE_RECEIVED = 2;
 
@@ -32,6 +34,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.chatMessages = chatMessages;
         this.senderId = senderId;
         this.classId = classId;
+    }
+
+    // --- HÀM PHỤ: Xử lý Copy vào Clipboard ---
+    private static void copyToClipboard(Context context, String text) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("Chat Message", text);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(context, "Đã sao chép tin nhắn", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -47,12 +59,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_SENT) {
-            // Nếu là tin nhắn gửi -> Dùng layout item_sent_message
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_send_message, parent, false);
             return new SentMessageViewHolder(view, classId);
         } else {
-            // Nếu là tin nhắn nhận -> Dùng layout item_received_message
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_received_message, parent, false);
             return new ReceivedMessageViewHolder(view, classId);
@@ -75,7 +85,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return chatMessages.size();
     }
 
-    // --- ViewHolder cho tin nhắn gửi ---
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textMessage, textDateTime;
         private final android.widget.Button btnStartQuiz;
@@ -93,11 +102,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             textMessage.setText(chatMessage.getMessage());
             textDateTime.setText(getReadableDateTime(chatMessage.getTimestamp()));
 
+            // SỬA TẠI ĐÂY: Thêm sự kiện nhấn giữ để copy
+            textMessage.setOnLongClickListener(v -> {
+                copyToClipboard(v.getContext(), chatMessage.getMessage());
+                return true;
+            });
+
             if ("exam".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
-
                 btnStartQuiz.setOnClickListener(v -> {
-                    android.content.Context context = v.getContext();
+                    Context context = v.getContext();
                     Intent intent = new Intent(context, DoQuizActivity.class);
                     intent.putExtra("EXAM_ID", chatMessage.getExamId());
                     intent.putExtra("EXAM_NAME", chatMessage.getMessage());
@@ -106,9 +120,8 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 });
             } else if ("quiz".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
-
                 btnStartQuiz.setOnClickListener(v -> {
-                    android.content.Context context = v.getContext();
+                    Context context = v.getContext();
                     Intent intent = new Intent(context, DoQuizActivity.class);
                     intent.putExtra("TOPIC", chatMessage.getTopic());
                     intent.putExtra("LEVEL", chatMessage.getLevel());
@@ -121,7 +134,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    // --- ViewHolder cho tin nhắn nhận ---
     static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textMessage, textDateTime;
         private final android.widget.Button btnStartQuiz;
@@ -139,10 +151,15 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             textMessage.setText(chatMessage.getMessage());
             textDateTime.setText(getReadableDateTime(chatMessage.getTimestamp()));
 
+            // SỬA TẠI ĐÂY: Thêm sự kiện nhấn giữ để copy
+            textMessage.setOnLongClickListener(v -> {
+                copyToClipboard(v.getContext(), chatMessage.getMessage());
+                return true;
+            });
+
             if ("exam".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
                 btnStartQuiz.setText("📝 Làm bài ngay");
-
                 btnStartQuiz.setOnClickListener(v -> {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, DoQuizActivity.class);
@@ -154,19 +171,13 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             } else if ("quiz".equals(chatMessage.getType())) {
                 btnStartQuiz.setVisibility(View.VISIBLE);
                 btnStartQuiz.setText("📝 Làm bài ngay");
-
-                btnStartQuiz.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, DoQuizActivity.class);
-                        intent.putExtra("TOPIC", chatMessage.getTopic());
-                        intent.putExtra("LEVEL", chatMessage.getLevel());
-                        intent.putExtra("LIMIT", chatMessage.getLimit());
-
-                        // Bắt đầu Activity
-                        context.startActivity(intent);
-                    }
+                btnStartQuiz.setOnClickListener(v -> {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, DoQuizActivity.class);
+                    intent.putExtra("TOPIC", chatMessage.getTopic());
+                    intent.putExtra("LEVEL", chatMessage.getLevel());
+                    intent.putExtra("LIMIT", chatMessage.getLimit());
+                    context.startActivity(intent);
                 });
             } else {
                 btnStartQuiz.setVisibility(View.GONE);
@@ -174,7 +185,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    // Hàm phụ để format ngày giờ cho đẹp (Ví dụ: "14:30 - 20/12/2025")
     private static String getReadableDateTime(java.util.Date date) {
         if (date == null) return "";
         return new SimpleDateFormat("HH:mm dd/MM", Locale.getDefault()).format(date);
