@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.example.studyspace.R;
+import android.util.Log;
 
 public class ManageMemberActivity extends AppCompatActivity {
 
@@ -73,10 +74,23 @@ public class ManageMemberActivity extends AppCompatActivity {
             if (userDoc.exists()) {
                 Map<String, String> student = new HashMap<>();
                 student.put("uid", uid);
-                student.put("name", userDoc.getString("fullName"));
+
+                // 1. Lấy dữ liệu từ Firestore
+                String fullName = userDoc.getString("fullName");
+                String sId = userDoc.getString("studentId");
+
+                // 2. Kiểm tra null và nối chuỗi
+                String nameDisplay = (fullName != null ? fullName : "N/A");
+                String idDisplay = (sId != null ? sId : "N/A");
+
+                // 3. Đưa chuỗi đã nối vào Map với key là "name" (để Adapter hiển thị)
+                student.put("name", nameDisplay + " (" + idDisplay + ")");
+
                 studentDataList.add(student);
                 adapter.notifyDataSetChanged();
             }
+        }).addOnFailureListener(e -> {
+            Log.e("ManageMember", "Lỗi tải sinh viên: " + e.getMessage());
         });
     }
 

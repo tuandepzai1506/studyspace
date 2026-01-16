@@ -379,25 +379,43 @@ public class ClassScoresActivity extends AppCompatActivity {
                 updateScoreList(scoreMap);
                 return;
             }
-
+            List<String> idsToRemove = new ArrayList<>();
             for (String userId : scoreMap.keySet()) {
-                db.collection("users").document(userId)
-                        .get()
+                db.collection("users").document(userId).get()
                         .addOnSuccessListener(userDoc -> {
                             if (userDoc.exists()) {
-                                String fullName = userDoc.getString("fullName");
-                                scoreMap.get(userId).setStudentName(fullName != null ? fullName : "N/A");
+                                String role = userDoc.getString("role");
+                                if ("teacher".equals(role)) {
+                                    idsToRemove.add(userId);
+                                } else {
+                                    String fullName = userDoc.getString("fullName");
+                                    String sId = userDoc.getString("studentId"); // Lấy mã số sinh viên
+
+                                    // Hiển thị dạng: Nguyễn Văn A (SV001)
+                                    String displayName = (fullName != null ? fullName : "N/A") +
+                                            " (" + (sId != null ? sId : "N/A") + ")";
+
+                                    scoreMap.get(userId).setStudentName(displayName);
+                                }
                             }
+
                             count[0]++;
 
                             if (count[0] == total) {
-                                // All student names loaded, update UI
+                                // Sau khi đã kiểm tra xong tất cả các User
+                                // Tiến hành xóa các giáo viên khỏi scoreMap trước khi update UI
+                                for (String id : idsToRemove) {
+                                    scoreMap.remove(id);
+                                }
                                 updateScoreList(scoreMap);
                             }
                         })
                         .addOnFailureListener(e -> {
                             count[0]++;
                             if (count[0] == total) {
+                                for (String id : idsToRemove) {
+                                    scoreMap.remove(id);
+                                }
                                 updateScoreList(scoreMap);
                             }
                         });

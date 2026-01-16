@@ -82,8 +82,31 @@ public class scoreTable extends AppCompatActivity {
         String currentUserId = mAuth.getCurrentUser().getUid();
 
         // Lấy từ bảng "quiz_results", lọc theo User ID, sắp xếp ngày mới nhất lên đầu
+        db.collection("users").document(currentUserId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    String role = documentSnapshot.getString("role");
+
+                    // Bước 2: Chỉ học sinh mới được load dữ liệu điểm
+                    if ("student".equals(role)) {
+                        fetchQuizResults(currentUserId);
+                    } else {
+                        // Nếu là giáo viên, hiển thị thông báo trống hoặc ẩn danh sách
+                        listScore.clear();
+                        scoreAdapter.notifyDataSetChanged();
+                        tvEmpty.setText("Tài khoản giáo viên không hiển thị điểm cá nhân.");
+                        tvEmpty.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ScoreTable", "Lỗi lấy điểm: ", e);
+                    // Lưu ý: Nếu báo lỗi "requires an index", hãy check Logcat và bấm vào link để tạo Index
+                    Toast.makeText(scoreTable.this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                });
+    }
+    private void fetchQuizResults(String userId) {
         db.collection("quiz_results")
-                .whereEqualTo("userId", currentUserId)
+                .whereEqualTo("userId", userId)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -94,7 +117,6 @@ public class scoreTable extends AppCompatActivity {
                     }
                     scoreAdapter.notifyDataSetChanged();
 
-                    // Hiển thị thông báo trống nếu không có dữ liệu
                     if (listScore.isEmpty()) {
                         tvEmpty.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);
@@ -102,11 +124,6 @@ public class scoreTable extends AppCompatActivity {
                         tvEmpty.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("ScoreTable", "Lỗi lấy điểm: ", e);
-                    // Lưu ý: Nếu báo lỗi "requires an index", hãy check Logcat và bấm vào link để tạo Index
-                    Toast.makeText(scoreTable.this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
                 });
     }
 }
